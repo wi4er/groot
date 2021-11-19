@@ -1,9 +1,8 @@
 const mongoose = require("mongoose");
 
-
 function getConnectionUrl() {
     if (process.env.DB_URL) {
-        return process.env.DB_URL; //mongodb+srv://doadmin:2B8Fwe1M453E0vi6@db-mongodb-fra1-27972-824c3788.mongo.ondigitalocean.com/admin?authSource=admin&replicaSet=db-mongodb-fra1-27972
+        return process.env.DB_URL;
     }
 
     return [
@@ -56,7 +55,7 @@ module.exports = {
         return (req, res, next) => {
             this.connect()
                 .then(() => next())
-                .catch(err => res.send(err.message));
+                .catch(err => next(err));
         }
     }
 }

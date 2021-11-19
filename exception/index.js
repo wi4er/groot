@@ -1,6 +1,6 @@
-const WrongIdError = require("../exception/WrongIdError");
-const PermissionError = require("../exception/PermissionError");
-const WrongRefError = require("../exception/WrongRefError");
+const WrongIdError = require("./WrongIdError");
+const PermissionError = require("./PermissionError");
+const WrongRefError = require("./WrongRefError");
 const {Error: {ValidationError}} = require("mongoose");
 
 function formatError(err) {
