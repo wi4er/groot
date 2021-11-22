@@ -1,8 +1,6 @@
 const mongoose = require("mongoose");
 
-
-
-class Connection {
+class Model {
     connection = null;
 
     constructor() {
@@ -73,4 +71,4 @@ class Connection {
     }
 }
 
-module.exports = new Connection();
+module.exports = new Model();

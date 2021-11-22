@@ -3,7 +3,7 @@ const app = require("express")();
 app.use(require("cors")({}));
 app.use(require('body-parser').json());
 app.use(require("../permission"));
-app.use(require("../model").createConnection());
+app.use(require("../model"));
 
 app.get("/", (req, res) => {
     res.send("<h1 style='display:flex; justify-content:center; align-items:center; height:100%'>Groot here!</h1>");

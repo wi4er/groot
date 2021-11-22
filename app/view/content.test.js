@@ -1,28 +1,29 @@
 const request = require("supertest");
 const app = require("..");
+const jwt = require("jsonwebtoken");
 
 afterEach(() => require("../model").clearDatabase());
 
 describe("Content entity", function () {
-    describe("Content getting", () => {
-        test("Should get list", done => {
-            request(app)
+    describe("Content fields", () => {
+        test("Should get list", async () => {
+            await request(app)
                 .get("/content/")
-                .expect(200)
                 .set(...require("./mock/auth"))
-                .then(() => done());
+                .expect(200)
+                .then(res => {
+                    expect(res.body).toEqual([]);
+                });
         });
 
-        test("Should post item", done => {
-            request(app)
+        test("Should post item", async () => {
+            await request(app)
                 .post("/content/")
                 .send({slug: "Some data"})
                 .set(...require("./mock/auth"))
                 .expect(201)
                 .then(res => {
                     expect(JSON.parse(res.text).slug).toBe("Some data");
-
-                    done();
                 });
         });
 
@@ -266,4 +267,52 @@ describe("Content entity", function () {
                 });
         });
     })
+
+    describe("Content permissions", () => {
+        test("Should get list with permission", async () => {
+            await request(app)
+                .post("/permission/")
+                .set(...require("./mock/auth"))
+                .send({
+                    method: "GET",
+                    entity: "CONTENT",
+                    group: 1,
+                })
+                .expect(201);
+
+            await request(app)
+                .get("/content/")
+                .set("authorization", `Bearer ${jwt.sign(
+                    {id: 1, group: [1]},
+                    "hello world !",
+                    { algorithm: 'HS256'}
+                )}`)
+                .expect(200)
+
+                .then(res => {
+                    expect(res.body).toEqual([]);
+                });
+        });
+
+        test("Shouldn't get list without permission", async () => {
+            await request(app)
+                .post("/permission/")
+                .set(...require("./mock/auth"))
+                .send({
+                    method: "GET",
+                    entity: "CONTENT",
+                    group: 2
+                })
+                .expect(201);
+
+            await request(app)
+                .get("/content/")
+                .set("authorization", `Bearer ${jwt.sign(
+                    {id: 1, group: [1]},
+                    "hello world !",
+                    { algorithm: 'HS256'}
+                )}`)
+                .expect(403);
+        });
+    });
 });
