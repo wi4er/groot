@@ -16,9 +16,7 @@ router.get(
         Content.find(
             contentQuery.parseFilter(req.query.filter)
         )
-            .then(result => {
-                res.withCache(result);
-            })
+            .then(result => res.json(result))
             .catch(next);
     }
 );
@@ -33,7 +31,7 @@ router.get(
             .then(result => {
                 WrongIdError.assert(result, `Cant find content with id ${id}!`);
 
-                res.send(result);
+                res.json(result);
             })
             .catch(next);
     }
@@ -49,7 +47,7 @@ router.post(
         new Content(req.body).save()
             .then(inst => {
                 res.status(201);
-                res.send(inst);
+                res.json(inst);
             })
             .catch(next);
     }
@@ -69,7 +67,7 @@ router.put(
 
                 return Object.assign(result, req.body).save();
             })
-            .then(saved => res.send(saved))
+            .then(saved => res.json(saved))
             .catch(next);
     }
 );
@@ -88,7 +86,7 @@ router.delete(
 
                 return result.delete();
             })
-            .then(() => res.send(true))
+            .then(() => res.json(true))
             .catch(next);
     }
 );

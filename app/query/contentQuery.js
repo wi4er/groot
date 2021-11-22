@@ -1,6 +1,6 @@
 const filterList = {
     "field_id": (result, list) => {
-        result["_id"] = list;
+        result["_id"] = {$in: list};
     },
     "field_slug": (result, list) => {
         result["slug"] = {$in: list};

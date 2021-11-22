@@ -19,7 +19,7 @@ services:
       DB_HOST: mongo
       DB_USER: content
       DB_PASSWORD: example
-      CACHE_PATH: cache
+      CACHE_HOST: cache
     links:
       - mongo
       - cache

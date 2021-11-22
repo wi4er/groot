@@ -5,7 +5,7 @@ module.exports = key => (req, res, next) => {
     if (process.env.CACHE_PATH) {
         if (!client) {
             client = redis.createClient({
-                host: process.env.CACHE_PATH
+                host: process.env.CACHE_HOST
             });
 
             client.on("error", function (error) {
@@ -14,7 +14,7 @@ module.exports = key => (req, res, next) => {
         }
         res.cache = client;
 
-        res.withCache = data => {
+        res.json = data => {
             res.json(data);
             client.set(req.originalUrl, JSON.stringify(data));
         }
@@ -35,7 +35,6 @@ module.exports = key => (req, res, next) => {
             });
         }
     } else {
-        res.withCache = data => res.json(data);
         res.clearKey = clear => {}
         next();
     }
