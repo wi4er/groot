@@ -1,0 +1,25 @@
+const app = require("express")();
+
+app.use(require("cors")({}));
+app.use(require('body-parser').json());
+app.use(require("./permission"));
+app.use(require("./model"));
+
+app.get("/", (req, res) => {
+    res.send("<h1 style='display:flex; justify-content:center; align-items:center; height:100%'>Groot here!</h1>");
+});
+
+app.use("/permission/", require("./view/permission"));
+app.use("/content/", require("./view/content"));
+app.use("/description/", require("./view/description"));
+app.use("/directory/", require("./view/directory"));
+app.use("/value/", require("./view/value"));
+app.use("/status/", require("./view/status"));
+app.use("/property/", require("./view/property"));
+app.use("/section/", require("./view/section"));
+app.use("/image/", require("./view/image"));
+
+app.use(require("./exception"));
+
+module.exports = app;
+
