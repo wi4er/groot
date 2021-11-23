@@ -53,6 +53,8 @@ router.put(
     (req, res, next) => {
         const {params: {id}} = req;
 
+        WrongIdError.assert(id === req.body._id, "Wrong id in body request");
+
         Value.findById(id)
             .then(result => {
                 WrongIdError.assert(result, `Cant update directory value with id ${id}!`);

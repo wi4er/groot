@@ -53,6 +53,8 @@ router.put(
     (req, res, next) => {
         const {id} = req.params;
 
+        WrongIdError.assert(id === req.body._id, "Wrong id in body request");
+
         Section.findById(id)
             .then(result => {
                 WrongIdError.assert(result, `Cant update section with id ${id}!`);
