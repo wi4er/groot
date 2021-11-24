@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const Status = require("./Status");
 const Lang = require("./Lang");
-const Property = require("./Property");
 
 const PropertyPropertySchema = new mongoose.Schema({
     value: {

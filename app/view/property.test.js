@@ -135,6 +135,35 @@ describe("Property entity", function () {
                 });
         });
 
+        test("Should update item with status", async () => {
+            await request(app)
+                .post("/status/")
+                .send({_id: "ACTIVE"})
+                .set(...require("./mock/auth"))
+                .expect(201);
+
+            await request(app)
+                .post("/property/")
+                .send({
+                    _id: "NAME",
+                    status: ["ACTIVE"]
+                })
+                .set(...require("./mock/auth"))
+                .expect(201);
+
+            await request(app)
+                .put("/property/NAME/")
+                .send({
+                    _id: "NAME",
+                    status: []
+                })
+                .set(...require("./mock/auth"))
+                .expect(200)
+                .then(res => {
+                    expect(res.body.status).toEqual([]);
+                });
+        });
+
         test("Should add item item with wrong status",  async () => {
             await request(app)
                 .post("/property/")
