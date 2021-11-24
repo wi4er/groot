@@ -19,8 +19,10 @@ const DirectoryPropertySchema = new mongoose.Schema({
 });
 
 const DirectorySchema = new mongoose.Schema({
-    _id: String,
-    timestamp: Date,
+    _id: {
+        type: String,
+        validate: v => v.length > 0,
+    },    timestamp: Date,
     status: [{
         type: String,
         ref: Status,

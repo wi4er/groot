@@ -21,7 +21,10 @@ const ValuePropertySchema = new mongoose.Schema({
 });
 
 const ValueSchema = new mongoose.Schema({
-    _id: String,
+    _id: {
+        type: String,
+        validate: v => v.length > 0,
+    },
     timestamp: Date,
     status: [{
         type: String,

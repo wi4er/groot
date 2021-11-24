@@ -2,6 +2,7 @@ const request = require("supertest");
 const app = require("..");
 
 afterEach(() => require("../model").clearDatabase());
+afterAll(() => require("../model").disconnect());
 
 describe("Status entity", function () {
     describe("Status fields", () => {
@@ -15,37 +16,47 @@ describe("Status entity", function () {
                 });
         });
 
-        test("Should add item", async () => {
-            await request(app)
-                .post("/status/")
-                .send({_id: "ACTIVE"})
-                .set(...require("./mock/auth"))
-                .expect(201)
-                .then(res => {
-                    expect(res.body._id).toBe("ACTIVE");
-                });
-        });
+        describe("Status adding", () => {
+            test("Should add item", async () => {
+                await request(app)
+                    .post("/status/")
+                    .send({_id: "ACTIVE"})
+                    .set(...require("./mock/auth"))
+                    .expect(201)
+                    .then(res => {
+                        expect(res.body._id).toBe("ACTIVE");
+                    });
+            });
 
-        test("Shouldn't add without id", async () => {
-            await request(app)
-                .post("/status/")
-                .send({some: "ACTIVE"})
-                .set(...require("./mock/auth"))
-                .expect(500);
-        });
+            test("Shouldn't add without id", async () => {
+                await request(app)
+                    .post("/status/")
+                    .send({some: "ACTIVE"})
+                    .set(...require("./mock/auth"))
+                    .expect(500);
+            });
 
-        test("Shouldn't add with same id", async () => {
-            await request(app)
-                .post("/status/")
-                .send({_id: "ACTIVE"})
-                .set(...require("./mock/auth"))
-                .expect(201);
+            test("Shouldn't add with blank id", async () => {
+                await request(app)
+                    .post("/status/")
+                    .send({_id: ""})
+                    .set(...require("./mock/auth"))
+                    .expect(400);
+            });
 
-            await request(app)
-                .post("/status/")
-                .send({_id: "ACTIVE"})
-                .set(...require("./mock/auth"))
-                .expect(400);
+            test("Shouldn't add with same id", async () => {
+                await request(app)
+                    .post("/status/")
+                    .send({_id: "ACTIVE"})
+                    .set(...require("./mock/auth"))
+                    .expect(201);
+
+                await request(app)
+                    .post("/status/")
+                    .send({_id: "ACTIVE"})
+                    .set(...require("./mock/auth"))
+                    .expect(400);
+            });
         });
 
         test("Should delete item", async () => {

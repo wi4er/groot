@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest . --verbose --testEnvironment=node --watchAll --runInBand --detectOpenHandles",
+    "test": "jest . --verbose --testEnvironment=node --watchAll --runInBand",
+    "leak": "jest . --verbose --testEnvironment=node --runInBand --detectOpenHandles",
     "coverage": "jest . --verbose --testEnvironment=node --runInBand --coverage",
     "start": "npm i && nodemon .",
     "stage": "node ."

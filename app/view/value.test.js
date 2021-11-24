@@ -2,9 +2,10 @@ const request = require("supertest");
 const app = require("..");
 
 afterEach(() => require("../model").clearDatabase());
+afterAll(() => require("../model").disconnect());
 
-describe("Description entity", function () {
-    describe("Description fields", () => {
+describe("Value endpoint", function () {
+    describe("Value fields", () => {
         test("Should get list", async () => {
             await request(app)
                 .get("/value/")
@@ -12,21 +13,37 @@ describe("Description entity", function () {
                 .expect(200);
         });
 
-        test("Should post item", async () => {
-            await request(app)
-                .post("/directory/")
-                .send({_id: "COLOR"})
-                .set(...require("./mock/auth"))
-                .expect(201);
+        describe("Value adding", () => {
+            // test("Shouldn't post value with same id", async () => {
+            //     await request(app)
+            //         .post("/value/")
+            //         .send({_id: "UNIQ"})
+            //         .set(...require("./mock/auth"))
+            //         .expect(201);
+            //
+            //     await request(app)
+            //         .post("/value/")
+            //         .send({_id: "UNIQ"})
+            //         .set(...require("./mock/auth"))
+            //         .expect(400);
+            // });
 
-            await request(app)
-                .post("/value/")
-                .send({_id: "BLUE", directory: "COLOR"})
-                .set(...require("./mock/auth"))
-                .expect(201)
-                .then(res => {
-                    expect(res.body._id).toBe("BLUE");
-                });
+            test("Should post item", async () => {
+                await request(app)
+                    .post("/directory/")
+                    .send({_id: "COLOR"})
+                    .set(...require("./mock/auth"))
+                    .expect(201);
+
+                await request(app)
+                    .post("/value/")
+                    .send({_id: "BLUE", directory: "COLOR"})
+                    .set(...require("./mock/auth"))
+                    .expect(201)
+                    .then(res => {
+                        expect(res.body._id).toBe("BLUE");
+                    });
+            });
         });
     });
 

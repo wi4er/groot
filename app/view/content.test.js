@@ -3,6 +3,7 @@ const app = require("..");
 const jwt = require("jsonwebtoken");
 
 afterEach(() => require("../model").clearDatabase());
+afterAll(() => require("../model").disconnect());
 
 describe("Content entity", function () {
     describe("Content fields", () => {

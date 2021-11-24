@@ -2,6 +2,7 @@ const request = require("supertest");
 const app = require("..");
 
 afterEach(() => require("../model").clearDatabase());
+afterAll(() => require("../model").disconnect());
 
 describe("Property entity", function () {
     describe("Property fields", () => {
@@ -43,6 +44,7 @@ describe("Property entity", function () {
                     .expect(201)
                     .then(res => {
                         expect(res.body._id).toBe("NAME");
+                        expect(new Date(res.body.timestamp).toString()).not.toBe("Invalid Date");
                     });
             });
 
@@ -56,6 +58,14 @@ describe("Property entity", function () {
                 await request(app)
                     .post("/property/")
                     .send({_id: "NAME"})
+                    .set(...require("./mock/auth"))
+                    .expect(400);
+            });
+
+            test("Shouldn't add with blank id", async () => {
+                await request(app)
+                    .post("/property/")
+                    .send({_id: ""})
                     .set(...require("./mock/auth"))
                     .expect(400);
             });

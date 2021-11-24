@@ -2,6 +2,7 @@ const request = require("supertest");
 const app = require("..");
 
 afterEach(() => require("../model").clearDatabase());
+afterAll(() => require("../model").disconnect());
 
 describe("Permission endpoint", function () {
     describe("Permission fields", () => {

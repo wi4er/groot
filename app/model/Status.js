@@ -1,7 +1,10 @@
 const mongoose = require("mongoose");
 
 const StatusSchema = new mongoose.Schema({
-    _id: String,
+    _id: {
+        type: String,
+        validate: v => v.length > 0,
+    },
     timestamp: Date,
 });
 
