@@ -29,11 +29,19 @@ class Environment {
     }
 
     get DB_URL() {
-        return process.env.DB_NAME || "content";
+        return process.env.DB_NAME;
     }
 
     get USE_SSL() {
         return process.env.USE_SSL;
+    }
+
+    get SECRET() {
+        return process.env.SECRET || "hello world !";
+    }
+
+    CACHE_PATH() {
+        return process.env.CACHE_PATH;
     }
 }
 

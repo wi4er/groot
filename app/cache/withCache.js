@@ -1,11 +1,12 @@
 const redis = require("redis");
+const env = require("../../environment");
 let client;
 
 module.exports = key => (req, res, next) => {
-    if (process.env.CACHE_PATH) {
+    if (env.CACHE_PATH) {
         if (!client) {
             client = redis.createClient({
-                host: process.env.CACHE_HOST
+                host: env.CACHE_PATH
             });
 
             client.on("error", function (error) {

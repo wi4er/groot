@@ -14,7 +14,7 @@ class Model {
     }
 
     getConnectionUrl() {
-        if (process.env.DB_URL) {
+        if (env.DB_URL) {
             return env.DB_URL;
         }
 
