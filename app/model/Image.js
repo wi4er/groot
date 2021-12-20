@@ -1,22 +1,5 @@
 const mongoose = require("mongoose");
 const Status = require("./Status");
-const Lang = require("./Lang");
-const Property = require("./Property");
-
-const ImagePropertySchema = new mongoose.Schema({
-    value: {
-        type: [String],
-        validate: v => v.length > 0,
-    },
-    property: {
-        type: String,
-        ref: Property,
-    },
-    lang: {
-        type: String,
-        ref: Lang,
-    },
-});
 
 const ImageSchema = new mongoose.Schema({
     _id: {
@@ -28,7 +11,13 @@ const ImageSchema = new mongoose.Schema({
         type: String,
         ref: Status,
     }],
-    property: [ImagePropertySchema],
+    property: {
+        type: Map,
+        of: {
+            type: Map,
+            of: [String],
+        },
+    },
 });
 
 ImageSchema.pre("save", require("../cleaner/propertyCleaner"));

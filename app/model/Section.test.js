@@ -25,48 +25,44 @@ describe("Section", () => {
 
             const inst = await new Section({
                 slug: "DATA",
-                property: [{
-                    value: "VALUE",
-                    property: "PROP",
-                }]
+                property: {
+                    "DEF": {
+                        "PROP": "VALUE",
+                    }
+                }
             }).save();
 
-            expect(inst.property.length).toBe(1);
-            expect(inst.property[0].value).toEqual(["VALUE"]);
+            expect(inst.property.size).toBe(1);
+            expect(inst.property.get("DEF").size).toBe(1);
+            expect(inst.property.get("DEF").get("PROP")).toEqual(["VALUE"]);
         });
 
-        test("Should create with property and populate", async () => {
-            await new Property({_id: "SHORT"}).save();
-
-            const inst = await new Section({
-                slug: "DATA",
-                property: [{
-                    value: "VALUE",
-                    property: "SHORT",
-                }]
-            }).save();
-
-            const result = await Section
-                .findById(inst._id)
-                .populate({
-                    path: "property",
-                    populate: {path: "property"}
-                });
-
-            expect(result.property.length).toBe(1);
-            expect(result.property[0].property._id).toEqual("SHORT");
-        });
-
-        test("Shouldn't create with wrong property", async () => {
+        test("Should create with wrong property", async () => {
             const item = await new Section({
                 slug: "DATA",
-                property: [{
-                    value: "VALUE_1",
-                    property: "LABEL",
-                }]
+                property: {
+                    "DEF": {
+                        "LABEL": "VALUE_1",
+                    }
+                }
             }).save();
 
-            expect(item.property).toHaveLength(0);
+            expect(item.property.size).toBe(0);
+        });
+
+        test("Should create with wrong lang", async () => {
+            await new Property({_id: "PROP"}).save();
+
+            const item = await new Section({
+                slug: "DATA",
+                property: {
+                    "WRONG": {
+                        "PROP": "VALUE_1",
+                    }
+                }
+            }).save();
+
+            expect(item.property.size).toBe(0);
         });
     });
 
@@ -125,48 +121,29 @@ describe("Section", () => {
 
             const inst = await new Section({
                 slug: "DATA",
-                description: [{
-                    value: "TEXT",
-                    description: "DETAIL",
-                }],
+                description: {
+                    "DEF": {
+                        "DETAIL": "TEXT"
+                    }
+                },
             }).save();
 
-            expect(inst.description.length).toBe(1);
-            expect(inst.description[0].value).toEqual(["TEXT"]);
+            expect(inst.description.size).toBe(1);
+            expect(inst.description.get("DEF").size).toBe(1);
+            expect(inst.description.get("DEF").get("DETAIL")).toEqual(["TEXT"]);
         });
 
-        test("Should create with description and populate", async () => {
-            await new Description({_id: "DETAIL"}).save()
-
-            const inst = await new Section({
-                slug: "DATA",
-                description: [{
-                    value: "TEXT",
-                    description: "DETAIL",
-                }],
-            }).save();
-
-            const list = await Section.findById(inst._id)
-                .populate({
-                    path: "description",
-                    populate: {path: "description"}
-                })
-                .exec();
-
-            expect(list.description.length).toBe(1);
-            expect(list.description[0].description._id).toEqual("DETAIL");
-        });
-
-        test("Shouldn't create section with wrong description", async () => {
+        test("Should create section with wrong description", async () => {
             const item = await new Section({
                 slug: "DATA",
-                description: [{
-                    value: "TEXT",
-                    description: "DETAIL",
-                }],
+                description: {
+                    "DEF": {
+                        "WRONG": "TEXT"
+                    }
+                },
             }).save();
 
-            expect(item.description).toHaveLength(0);
+            expect(item.description.size).toBe(0);
         });
     });
 

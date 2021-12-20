@@ -4,7 +4,7 @@ const app = require("..");
 afterEach(() => require("../model").clearDatabase());
 afterAll(() => require("../model").disconnect());
 
-describe("Description entity", function () {
+describe("Description endpoint", function () {
     describe("Description fields", () => {
         describe("Description get", () => {
             test("Should get list", async () => {
@@ -16,9 +16,7 @@ describe("Description entity", function () {
                         expect(response.body.length).toBe(0);
                     });
             });
-        });
 
-        describe("Description adding", () => {
             test("Should post item", async () => {
                 await request(app)
                     .post("/description/")
@@ -71,7 +69,7 @@ describe("Description entity", function () {
         });
     });
 
-    describe("Description adding with property", () => {
+    describe("Description with property", () => {
         test("Should post item with property", async () => {
             await request(app)
                 .post("/property/")
@@ -83,22 +81,22 @@ describe("Description entity", function () {
                 .post("/description/")
                 .send({
                     _id: "WITH_PROPERTY",
-                    property: [{
-                        value: "VALUE",
-                        property: "PROPERTY"
-                    }]
+                    property: {
+                        "DEF": {
+                            "PROPERTY": "VALUE"
+                        }
+                    }
                 })
                 .set(...require("./mock/auth"))
                 .expect(201)
                 .then(res => {
-                    expect(res.body._id).toBe("WITH_PROPERTY");
-                    expect(res.body.property).toHaveLength(1);
-                    expect(res.body.property[0].value).toEqual(["VALUE"]);
+                    expect(Object.keys(res.body.property)).toHaveLength(1);
+                    expect(res.body.property["DEF"]["PROPERTY"]).toEqual(["VALUE"]);
                 });
         });
     });
 
-    describe("Description adding with status", () => {
+    describe("Description with status", () => {
         test("Should post item with status", async () => {
             await request(app)
                 .post("/status/")

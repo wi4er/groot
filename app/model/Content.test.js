@@ -3,6 +3,7 @@ const Property = require("./Property");
 const Image = require("./Image");
 const Description = require("./Description");
 const Status = require("./Status");
+const Lang = require("./Lang");
 const Directory = require("./Directory");
 const DirectoryValue = require("./Value");
 
@@ -27,59 +28,128 @@ describe("Content", () => {
 
             const inst = await new Content({
                 slug: "DATA",
-                property: [{
-                    value: "VALUE",
-                    property: "PROP",
-                }]
-            }).save();
-
-            expect(inst.property.length).toBe(1);
-            expect(inst.property[0].value).toEqual(["VALUE"]);
-        });
-
-        test("Should create with property and populate", async () => {
-            await new Property({_id: "SHORT"}).save();
-
-            const inst = await new Content({
-                slug: "DATA",
-                property: [{
-                    value: "VALUE",
-                    property: "SHORT",
-                }]
-            }).save();
-
-            const result = await Content
-                .findById(inst._id)
-                .populate({
-                    path: "property",
-                    populate: {
-                        path: "property"
+                property: {
+                    "DEF": {
+                        "PROP": "VALUE"
                     }
-                });
-
-            expect(result.property.length).toBe(1);
-            expect(result.property[0].property._id).toEqual("SHORT");
-        });
-
-        test("Shouldn't create with wrong property", async () => {
-            const inst = await new Content({
-                slug: "DATA",
-                property: [{
-                    value: "VALUE_1",
-                    property: "LABEL",
-                }]
+                }
             }).save();
 
-            expect(inst.property).toHaveLength(0);
+            expect(inst.property.size).toBe(1);
+            expect(inst.property.get("DEF").get("PROP")).toEqual(["VALUE"]);
         });
 
-        test("Shouldn't create with empty property", async () => {
-            await expect(new Content({
+        test("Should create with wrong property", async () => {
+            const inst = await new Content({
                 slug: "DATA",
-                property: [{
-                    value: "VALUE_1",
-                }]
-            }).save()).rejects.toThrow();
+                property: {
+                    "DEF": {
+                        "LABEL":  "VALUE_1"
+                    }
+                }
+            }).save();
+
+            expect(inst.property.size).toBe(0);
+        });
+
+        test("Should create with wrong and correct property", async () => {
+            await new Property({_id: "PROP"}).save();
+
+            const inst = await new Content({
+                slug: "DATA",
+                property: {
+                    "DEF": {
+                        "PROP": "VALUE",
+                        "WRONG":  "VALUE"
+                    }
+                }
+            }).save();
+
+            expect(inst.property.size).toBe(1);
+            expect(inst.property.get("DEF").size).toBe(1);
+        });
+
+        test("Should create with lang property", async () => {
+            await new Property({_id: "PROP"}).save();
+            await new Lang({_id: "RU"}).save();
+
+            const inst = await new Content({
+                slug: "DATA",
+                property: {
+                    "RU": {
+                        "PROP": "VALUE",
+                    }
+                }
+            }).save();
+
+            expect(inst.property.size).toBe(1);
+            expect(inst.property.get("RU").size).toBe(1);
+            expect(inst.property.get("RU").get("PROP")).toEqual(["VALUE"]);
+        });
+
+        test("Should create with wrong lang", async () => {
+            await new Property({_id: "PROP"}).save();
+            await new Lang({_id: "RU"}).save();
+
+            const inst = await new Content({
+                slug: "DATA",
+                property: {
+                    "WRONG": {
+                        "PROP": "VALUE",
+                    }
+                }
+            }).save();
+
+            expect(inst.property.size).toBe(0);
+        });
+
+        test("Should create with wrong and correct lang", async () => {
+            await new Property({_id: "PROP"}).save();
+            await new Lang({_id: "RU"}).save();
+
+            const inst = await new Content({
+                slug: "DATA",
+                property: {
+                    "WRONG": {
+                        "PROP": "VALUE",
+                    },
+                    "RU": {
+                        "PROP": "VALUE",
+                    }
+                }
+            }).save();
+
+            expect(inst.property.size).toBe(1);
+            expect(inst.property.get("RU").size).toBe(1);
+            expect(inst.property.get("RU").get("PROP")).toEqual(["VALUE"]);
+        });
+
+        test("Should create with empty value", async () => {
+            await new Property({_id: "PROP"}).save();
+
+            const inst = await new Content({
+                slug: "DATA",
+                property: {
+                    "DEF": {
+                        "PROP": undefined,
+                    }
+                }
+            }).save();
+
+            expect(inst.property.size).toBe(0);
+        });
+
+        test("Should create with empty lang", async () => {
+            await new Property({_id: "PROP"}).save();
+
+            const inst = await new Content({
+                slug: "DATA",
+                property: {
+                    "DEF": undefined,
+                }
+            }).save();
+
+            expect(inst.property.size).toBe(0);
         });
     });
 
@@ -140,57 +210,62 @@ describe("Content", () => {
 
             const inst = await new Content({
                 slug: "DATA",
-                description: [{
-                    value: "TEXT",
-                    description: "DETAIL",
-                }],
+                description: {
+                    "DEF": {
+                        "DETAIL": "TEXT"
+                    }
+                },
             }).save();
 
-            expect(inst.description.length).toBe(1);
-            expect(inst.description[0].value).toEqual(["TEXT"]);
+            expect(inst.description.size).toBe(1);
+            expect(inst.description.get("DEF").size).toBe(1);
+            expect(inst.description.get("DEF").get("DETAIL")).toEqual(["TEXT"]);
         });
 
-        test("Should create with description and populate", async () => {
+        test("Should create content with wrong description", async () => {
+            const inst = await new Content({
+                slug: "DATA",
+                description: {
+                    "DEF": {
+                        "DETAIL": "TEXT"
+                    }
+                },
+            }).save();
+
+            expect(inst.description.size).toBe(0);
+        });
+
+        test("Should create content with lang", async () => {
+            await new Lang({_id: "EN"}).save();
             await new Description({_id: "DETAIL"}).save()
 
             const inst = await new Content({
                 slug: "DATA",
-                description: [{
-                    value: "TEXT",
-                    description: "DETAIL",
-                }],
+                description: {
+                    "EN": {
+                        "DETAIL": "TEXT"
+                    }
+                },
             }).save();
 
-            const list = await Content.findById(inst._id)
-                .populate({
-                    path: "description",
-                    populate: {path: "description"}
-                })
-                .exec();
-
-            expect(list.description.length).toBe(1);
-            expect(list.description[0].description._id).toEqual("DETAIL");
+            expect(inst.description.size).toBe(1);
+            expect(inst.description.get("EN").size).toBe(1);
         });
 
-        test("Shouldn't create content with wrong description", async () => {
+        test("Should create content with wrong lang", async () => {
+            await new Lang({_id: "EN"}).save();
+            await new Description({_id: "DETAIL"}).save()
+
             const inst = await new Content({
                 slug: "DATA",
-                description: [{
-                    value: "TEXT",
-                    description: "DETAIL",
-                }],
+                description: {
+                    "WRONG": {
+                        "DETAIL": "TEXT"
+                    }
+                },
             }).save();
 
-            expect(inst.description).toHaveLength(0);
-        });
-
-        test("Shouldn't create with empty description", async () => {
-            await expect(new Content({
-                slug: "DATA",
-                description: [{
-                    value: "VALUE_1",
-                }]
-            }).save()).rejects.toThrow();
+            expect(inst.description.size).toBe(0);
         });
     });
 

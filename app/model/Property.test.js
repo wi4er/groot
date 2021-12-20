@@ -5,13 +5,15 @@ afterEach(() => require(".").clearDatabase());
 beforeAll( () => require(".").connect());
 afterAll(() => require(".").disconnect());
 
-describe("Property", function () {
-    test("Should create", async () => {
-        const inst = await new Property({
-            _id: "DATA"
-        }).save();
+describe("Property entity", function () {
+    describe("Property fields", () => {
+        test("Should create", async () => {
+            const inst = await new Property({
+                _id: "DATA"
+            }).save();
 
-        expect(inst._id).toBe("DATA");
+            expect(inst._id).toBe("DATA");
+        });
     });
 
     describe("Property with property", () => {
@@ -20,27 +22,28 @@ describe("Property", function () {
 
             const inst = await new Property({
                 _id: "OUTER",
-                property: [{
-                    value: "VALUE",
-                    property: "INNER",
-                }]
+                property: {
+                    "DEF": {
+                        "INNER": "VALUE"
+                    }
+                }
             }).save();
 
             expect(inst._id).toBe("OUTER");
-            expect(inst.property[0].value).toEqual(["VALUE"]);
+            expect(inst.property.get("DEF").get("INNER")).toEqual(["VALUE"]);
         });
 
         test("Should create with wrong property", async () => {
             const inst = await new Property({
                 _id: "PROPERTY",
-                property: [{
-                    value: "VALUE",
-                    property: "WRONG",
-                }]
+                property: {
+                    "DEF": {
+                        "WRONG": "VALUE"
+                    }
+                }
             }).save();
 
-            expect(inst._id).toBe("PROPERTY");
-            expect(inst.property).toHaveLength(0);
+            expect(inst.property.size).toBe(0);
         });
 
         test("Should create with wrong and correct properties", async () => {
@@ -48,46 +51,20 @@ describe("Property", function () {
 
             const inst = await new Property({
                 _id: "OUTER",
-                property: [{
-                    value: "VALUE",
-                    property: "INNER",
-                }, {
-                    value: "VALUE",
-                    property: "WRONG",
-                }],
-            }).save();
-
-            expect(inst._id).toBe("OUTER");
-            expect(inst.property).toHaveLength(1);
-            expect(inst.property[0].property).toBe("INNER");
-            expect(inst.property[0].value).toEqual(["VALUE"]);
-        });
-
-        test("Should fetch with property", async () => {
-            await new Property({_id: "INNER"}).save();
-            await new Property({
-                _id: "OUTER",
-                property: [{
-                    value: "VALUE",
-                    property: "INNER",
-                }]
-            }).save();
-
-            await Property.findById("OUTER")
-                .populate({
-                    path: "property",
-                    populate: {
-                        path: "property"
+                property: {
+                    "DEF": {
+                        "INNER": "VALUE",
+                        "WRONG": "VALUE",
                     }
-                })
-                .exec()
-                .then(result => {
-                    expect(result.property[0].property._id).toBe("INNER");
-                });
+                },
+            }).save();
+
+            expect(inst.property.size).toBe(1);
+            expect(inst.property.get("DEF").size).toBe(1);
         });
     });
 
-    describe("Property with property", () => {
+    describe("Property with status", () => {
         test("Should filter by status", async () => {
             for (let i = 0; i < 3; i++) {
                 await new Status({_id: `Status_${i}`}).save();

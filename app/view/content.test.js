@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 afterEach(() => require("../model").clearDatabase());
 afterAll(() => require("../model").disconnect());
 
-describe("Content entity", function () {
+describe("Content endpoint", function () {
     describe("Content fields", () => {
         test("Should get list", async () => {
             await request(app)
@@ -118,10 +118,11 @@ describe("Content entity", function () {
                 .post("/content/")
                 .send({
                     slug: "Some data",
-                    property: [{
-                        value: "VALUE",
-                        property: "NAME",
-                    }]
+                    property: {
+                        "DEF": {
+                            "NAME": "VALUE"
+                        }
+                    }
                 })
                 .set(...require("./mock/auth"))
                 .expect(201)
@@ -129,12 +130,12 @@ describe("Content entity", function () {
                     const body = JSON.parse(result.text);
 
                     expect(body.slug).toBe("Some data");
-                    expect(body.property).toHaveLength(1);
-                    expect(body.property[0].value).toEqual(["VALUE"]);
+                    expect(Object.keys(body.property)).toHaveLength(1);
+                    expect(body.property["DEF"]["NAME"]).toEqual(["VALUE"]);
                 });
         });
 
-        test("Shouldn't post item with wrong property", async () => {
+        test("Should post item with wrong property", async () => {
             await request(app)
                 .post("/property/")
                 .send({_id: "NAME"})
@@ -145,15 +146,16 @@ describe("Content entity", function () {
                 .post("/content/")
                 .send({
                     slug: "Some data",
-                    property: [{
-                        value: "VALUE",
-                        property: "ARTICLE",
-                    }]
+                    property: {
+                        "DEF": {
+                            "ARTICLE": "VALUE"
+                        }
+                    }
                 })
                 .set(...require("./mock/auth"))
                 .expect(201)
                 .then(res => {
-                    expect(res.body.property).toHaveLength(0);
+                    expect(Object.keys(res.body.property)).toHaveLength(0);
                 });
         });
     });
@@ -170,10 +172,11 @@ describe("Content entity", function () {
                 .post("/content/")
                 .send({
                     slug: "Some data",
-                    description: [{
-                        value: "VALUE",
-                        description: "SHORT",
-                    }]
+                    description: {
+                        "DEF": {
+                            "SHORT": "VALUE"
+                        }
+                    }
                 })
                 .set(...require("./mock/auth"))
                 .expect(201)
@@ -181,12 +184,12 @@ describe("Content entity", function () {
                     const body = JSON.parse(result.text);
 
                     expect(body.slug).toBe("Some data");
-                    expect(body.description).toHaveLength(1);
-                    expect(body.description[0].value).toEqual(["VALUE"]);
+                    expect(Object.keys(body.description)).toHaveLength(1);
+                    expect(body.description["DEF"]["SHORT"]).toEqual(["VALUE"]);
                 });
         });
 
-        test("Shouldn't post item with wrong description", async () => {
+        test("Should post item with wrong description", async () => {
             await request(app)
                 .post("/description/")
                 .send({_id: "NAME"})
@@ -197,15 +200,16 @@ describe("Content entity", function () {
                 .post("/content/")
                 .send({
                     slug: "Some data",
-                    description: [{
-                        value: "VALUE",
-                        description: "LONG",
-                    }]
+                    description: {
+                        "DEF": {
+                            "LONG": "VALUE"
+                        }
+                    }
                 })
                 .set(...require("./mock/auth"))
                 .expect(201)
                 .then(res => {
-                    expect(res.body.description).toHaveLength(0);
+                    expect(Object.keys(res.body.description)).toHaveLength(0);
                 });
         });
     });
@@ -267,7 +271,141 @@ describe("Content entity", function () {
                     expect(body[0].slug).toBe("VALUE_1");
                 });
         });
-    })
+    });
+
+    describe("Content sorting", () => {
+        test("Should get with sort", async () => {
+            const slugs = ["AAA", "CCC", "BBB"];
+
+            for (let i = 0; i < 3; i++) {
+                await request(app)
+                    .post("/content/")
+                    .send({slug: `CONTENT_${slugs[i]}`})
+                    .set(...require("./mock/auth"))
+                    .expect(201);
+            }
+
+            await request(app)
+                .get("/content/?sort=slug_asc")
+                .set(...require("./mock/auth"))
+                .expect(200)
+                .then(res => {
+                    expect(res.body[0].slug).toBe("CONTENT_AAA");
+                    expect(res.body[1].slug).toBe("CONTENT_BBB");
+                    expect(res.body[2].slug).toBe("CONTENT_CCC");
+                });
+        });
+
+        test("Should get with status sort", async () => {
+            await request(app)
+                .post("/status/")
+                .send({_id: "STATUS"})
+                .set(...require("./mock/auth"))
+                .expect(201);
+
+            for (let i = 0; i < 6; i++) {
+                await request(app)
+                    .post("/content/")
+                    .send({
+                        slug: `CONTENT_${i}`,
+                        status: [i % 2 === 0 ? "STATUS" : undefined],
+                    })
+                    .set(...require("./mock/auth"))
+                    .expect(201);
+            }
+
+            await request(app)
+                .get("/content/?sort=status_STATUS_asc")
+                .set(...require("./mock/auth"))
+                .expect(200)
+                .then(res => {
+
+                    // expect(res.body[0].slug).toBe("CONTENT_AAA");
+                    // expect(res.body[1].slug).toBe("CONTENT_BBB");
+                    // expect(res.body[2].slug).toBe("CONTENT_CCC");
+                });
+        });
+    });
+
+    describe("Content pagination", () => {
+        test("Should get with limit", async () => {
+            for (let i = 0; i < 10; i++) {
+                await request(app)
+                    .post("/content/")
+                    .send({slug: `CONTENT_${i}`})
+                    .set(...require("./mock/auth"))
+                    .expect(201);
+            }
+
+            await request(app)
+                .get("/content/?limit=5")
+                .set(...require("./mock/auth"))
+                .expect(200)
+                .then(res => {
+                    expect(res.headers["total-row-count"]).toBe("10");
+                    expect(res.body).toHaveLength(5);
+                    expect(res.body[4].slug).toBe("CONTENT_4");
+                });
+        });
+
+        test("Should get row count", async () => {
+            for (let i = 0; i < 10; i++) {
+                await request(app)
+                    .post("/content/")
+                    .send({slug: `CONTENT_${i}`})
+                    .set(...require("./mock/auth"))
+                    .expect(201);
+            }
+
+            await request(app)
+                .head("/content/?limit=5")
+                .set(...require("./mock/auth"))
+                .expect(200)
+                .then(res => {
+                    expect(res.headers["total-row-count"]).toBe("10");
+                });
+        });
+
+        test("Should get with offset", async () => {
+            for (let i = 0; i < 10; i++) {
+                await request(app)
+                    .post("/content/")
+                    .send({slug: `CONTENT_${i}`})
+                    .set(...require("./mock/auth"))
+                    .expect(201);
+            }
+
+            await request(app)
+                .get("/content/?offset=4")
+                .set(...require("./mock/auth"))
+                .expect(200)
+                .then(res => {
+                    expect(res.headers["total-row-count"]).toBe("10");
+                    expect(res.body).toHaveLength(6);
+                    expect(res.body[0].slug).toBe("CONTENT_4");
+                });
+        });
+
+        test("Should get with limit and offset", async () => {
+            for (let i = 0; i < 10; i++) {
+                await request(app)
+                    .post("/content/")
+                    .send({slug: `CONTENT_${i}`})
+                    .set(...require("./mock/auth"))
+                    .expect(201);
+            }
+
+            await request(app)
+                .get("/content/?limit=3&offset=3")
+                .set(...require("./mock/auth"))
+                .expect(200)
+                .then(res => {
+                    expect(res.headers["total-row-count"]).toBe("10");
+                    expect(res.body).toHaveLength(3);
+                    expect(res.body[0].slug).toBe("CONTENT_3");
+                });
+        });
+    });
 
     describe("Content permissions", () => {
         test("Should get list with permission", async () => {
@@ -286,10 +424,9 @@ describe("Content entity", function () {
                 .set("authorization", `Bearer ${jwt.sign(
                     {id: 1, group: [1]},
                     "hello world !",
-                    { algorithm: 'HS256'}
+                    {algorithm: 'HS256'}
                 )}`)
                 .expect(200)
-
                 .then(res => {
                     expect(res.body).toEqual([]);
                 });
@@ -311,7 +448,7 @@ describe("Content entity", function () {
                 .set("authorization", `Bearer ${jwt.sign(
                     {id: 1, group: [1]},
                     "hello world !",
-                    { algorithm: 'HS256'}
+                    {algorithm: 'HS256'}
                 )}`)
                 .expect(403);
         });

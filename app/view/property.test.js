@@ -164,7 +164,7 @@ describe("Property entity", function () {
                 });
         });
 
-        test("Should add item item with wrong status",  async () => {
+        test("Should add item item with wrong status", async () => {
             await request(app)
                 .post("/property/")
                 .send({
@@ -191,17 +191,17 @@ describe("Property entity", function () {
                 .post("/property/")
                 .send({
                     _id: "WITH_NAME",
-                    property: [{
-                        value: "SOMETHING",
-                        property: "NAME",
-                    }]
+                    property: {
+                        "DEF": {
+                            "NAME": "SOMETHING"
+                        }
+                    }
                 })
                 .set(...require("./mock/auth"))
                 .expect(201)
                 .then(result => {
-                    expect(result.body.property).toHaveLength(1);
-                    expect(result.body.property[0].value).toEqual(["SOMETHING"]);
-                    expect(result.body.property[0].property).toEqual("NAME");
+                    expect(Object.keys(result.body.property)).toHaveLength(1);
+                    expect(result.body.property["DEF"]["NAME"]).toEqual(["SOMETHING"]);
                 });
         });
 
@@ -216,10 +216,11 @@ describe("Property entity", function () {
                 .post("/property/")
                 .send({
                     _id: "WITH_NAME",
-                    property: [{
-                        value: "SOMETHING",
-                        property: "NAME",
-                    }]
+                    property: {
+                        "DEF": {
+                            "NAME": "SOMETHING"
+                        }
+                    }
                 })
                 .set(...require("./mock/auth"))
                 .expect(201);
@@ -228,17 +229,17 @@ describe("Property entity", function () {
                 .put("/property/WITH_NAME/")
                 .send({
                     _id: "WITH_NAME",
-                    property: [{
-                        value: "UPDATED",
-                        property: "NAME",
-                    }]
+                    property: {
+                        "DEF": {
+                            "NAME": "UPDATED"
+                        }
+                    }
                 })
                 .set(...require("./mock/auth"))
                 .expect(200)
                 .then(result => {
-                    expect(result.body.property).toHaveLength(1);
-                    expect(result.body.property[0].value).toEqual(["UPDATED"]);
-                    expect(result.body.property[0].property).toBe("NAME");
+                    expect(Object.keys(result.body.property)).toHaveLength(1);
+                    expect(result.body.property["DEF"]["NAME"]).toEqual(["UPDATED"]);
                 });
         });
 
@@ -247,21 +248,22 @@ describe("Property entity", function () {
                 .post("/property/")
                 .send({
                     _id: "WITH_NAME",
-                    property: [{
-                        value: "SOMETHING",
-                        property: "WRONG",
-                    }]
+                    property: {
+                        "DEF": {
+                            "WRONG": "SOMETHING"
+                        }
+                    }
                 })
                 .set(...require("./mock/auth"))
                 .expect(201)
                 .then(res => {
-                    expect(res.body.property).toHaveLength(0);
+                    expect(Object.keys(res.body.property)).toHaveLength(0);
                 })
         });
     });
 
     describe("Property filters", () => {
-        test("Should add and get multi items" , async () => {
+        test("Should add and get multi items", async () => {
             const list = [];
 
             for (let i = 0; i < 10; i++) {

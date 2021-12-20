@@ -5,21 +5,6 @@ const Property = require("./Property");
 const Lang = require("./Lang");
 const WrongRefError = require("../exception/WrongRefError");
 
-const ValuePropertySchema = new mongoose.Schema({
-    value: {
-        type: [String],
-        validate: v => v.length > 0,
-    },
-    property: {
-        type: String,
-        ref: Property,
-    },
-    lang: {
-        type: String,
-        ref: Lang,
-    },
-});
-
 const ValueSchema = new mongoose.Schema({
     _id: {
         type: String,
@@ -34,7 +19,13 @@ const ValueSchema = new mongoose.Schema({
         type: String,
         ref: Directory,
     },
-    property: [ValuePropertySchema],
+    property: {
+        type: Map,
+        of: {
+            type: Map,
+            of: [String],
+        },
+    },
 });
 
 ValueSchema.pre("save", require("../cleaner/propertyCleaner"));

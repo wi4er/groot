@@ -20,14 +20,14 @@ describe("Permission endpoint", function () {
                 .send({
                     method: "GET",
                     entity: "CONTENT",
-                    group: 1,
+                    group: "1",
                 })
                 .set(...require("./mock/auth"))
                 .expect(201)
                 .then(res => {
                     expect(res.body.method).toBe("GET");
                     expect(res.body.entity).toBe("CONTENT");
-                    expect(res.body.group).toBe(1);
+                    expect(res.body.group).toBe("1");
                 });
         });
 
@@ -37,7 +37,7 @@ describe("Permission endpoint", function () {
                 .send({
                     method: "WRONG",
                     entity: "CONTENT",
-                    group: 1,
+                    group: "1",
                 })
                 .set(...require("./mock/auth"))
                 .expect(400);
@@ -49,7 +49,7 @@ describe("Permission endpoint", function () {
                 .send({
                     method: "GET",
                     entity: "WRONG",
-                    group: 1,
+                    group: "1",
                 })
                 .set(...require("./mock/auth"))
                 .expect(400);

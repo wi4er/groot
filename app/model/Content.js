@@ -1,37 +1,9 @@
 const mongoose = require("mongoose");
 const Image = require("./Image");
-const Property = require("./Property");
 const Section = require("./Section");
-const Description = require("./Description");
 const Status = require("./Status");
-const Lang = require("./Lang");
 const Value = require("./Value");
 const Directory = require("./Directory");
-
-const ContentPropertySchema = new mongoose.Schema({
-    value: {
-        type: [String],
-        validate: v => v.length > 0,
-    },
-    property: {
-        type: String,
-        ref: Property,
-        required: true,
-    },
-    lang: {
-        type: String,
-        ref: Lang,
-    },
-});
-
-const ContentDescriptionSchema = new mongoose.Schema({
-    value: [String],
-    description: {
-        type: String,
-        ref: Description,
-        required: true,
-    },
-});
 
 const ContentImageSchema = new mongoose.Schema({
     url: [String],
@@ -57,8 +29,20 @@ const ContentDirectorySchema = new mongoose.Schema({
 const ContentSchema = new mongoose.Schema({
     slug: String,
     timestamp: Date,
-    property: [ContentPropertySchema],
-    description: [ContentDescriptionSchema],
+    property: {
+        type: Map,
+        of: {
+            type: Map,
+            of: [String],
+        },
+    },
+    description: {
+        type: Map,
+        of: {
+            type: Map,
+            of: [String],
+        },
+    },
     image: [ContentImageSchema],
     directory: [ContentDirectorySchema],
     status: [{

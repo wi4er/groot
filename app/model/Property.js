@@ -1,22 +1,5 @@
 const mongoose = require("mongoose");
 const Status = require("./Status");
-const Lang = require("./Lang");
-
-const PropertyPropertySchema = new mongoose.Schema({
-    value: {
-        type: [String],
-        validate: v => v.length > 0,
-    },
-    property: {
-        type: String,
-        ref: "property",
-        required: true,
-    },
-    lang: {
-        type: String,
-        ref: Lang,
-    },
-});
 
 const PropertySchema = new mongoose.Schema({
     _id: {
@@ -28,7 +11,13 @@ const PropertySchema = new mongoose.Schema({
         type: String,
         ref: Status,
     }],
-    property: [PropertyPropertySchema],
+    property: {
+        type: Map,
+        of: {
+            type: Map,
+            of: [String],
+        },
+    },
 });
 
 PropertySchema.pre("save", require("../cleaner/propertyCleaner"));

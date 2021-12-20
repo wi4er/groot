@@ -22,7 +22,7 @@ describe("Description", function () {
         });
     });
 
-    describe("Description status", () => {
+    describe("Description with status", () => {
         test("Should create with status", async () => {
             await new Status({_id: "ACTIVE"}).save();
 
@@ -44,77 +44,50 @@ describe("Description", function () {
         });
     });
 
-    describe("Description property", () => {
+    describe("Description with property", () => {
         test("Should create item with property", async () => {
             await new Property({_id: "NAME"}).save();
 
             const inst = await new Description({
                 _id: "DATA",
-                property: [{
-                    value: "PRODUCT",
-                    property: "NAME",
-                }],
-            }).save();
-
-            expect(inst.property).toHaveLength(1);
-            expect(inst.property[0].value).toEqual(["PRODUCT"]);
-        });
-
-        test("Should populate item with property", async () => {
-            await new Property({_id: "NAME"}).save();
-
-            await new Description({
-                _id: "DATA",
-                property: [{
-                    value: "PRODUCT",
-                    property: "NAME",
-                }],
-            }).save();
-
-            const item = await Description
-                .findById("DATA")
-                .populate({
-                    path: "property",
-                    populate: {
-                        path: "property"
+                property: {
+                    "DEF": {
+                        "NAME": "PRODUCT"
                     }
-                })
-                .exec();
+                },
+            }).save();
 
-            expect(item.property).toHaveLength(1);
-            expect(item.property[0].property._id).toBe("NAME");
+            expect(inst.property.size).toBe(1);
+            expect(inst.property.get("DEF").size).toBe(1);
+            expect(inst.property.get("DEF").get("NAME")).toEqual(["PRODUCT"]);
         });
 
         test("Should create with wrong property", async () => {
             const inst = await new Description({
                 _id: "DATA",
-                property: [{
-                    value: "PRODUCT",
-                    property: "WRONG",
-                }],
+                property: {
+                    "DEF": {
+                        "WRONG": "PRODUCT"
+                    }
+                },
             }).save();
 
-            expect(inst.property).toHaveLength(0);
+            expect(inst.property.size).toBe(0);
         });
 
-        test("Shouldn't create without property", async () => {
-            await expect(new Description({
-                _id: "DATA",
-                property: [{
-                    value: "PRODUCT",
-                }],
-            }).save()).rejects.toThrow();
-        });
-
-        test("Shouldn't create without property value", async () => {
+        test("Should create with wrong lang", async () => {
             await new Property({_id: "NAME"}).save();
 
-            await expect(new Description({
+            const inst = await new Description({
                 _id: "DATA",
-                property: [{
-                    property: "NAME",
-                }],
-            }).save()).rejects.toThrow();
+                property: {
+                    "WRONG": {
+                        "NAME": "PRODUCT"
+                    }
+                },
+            }).save();
+
+            expect(inst.property.size).toBe(0);
         });
     });
 });

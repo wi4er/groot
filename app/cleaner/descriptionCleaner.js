@@ -1,15 +1,28 @@
+
 module.exports = async function(next) {
     const Description = require("../model/Description");
+    const Lang = require("../model/Lang");
 
-    for (const key in this.description) {
-        const res = await Description.findById(this.description[key].description);
+    for (const key of this.description?.keys() ?? []) {
+        if (!this.description.get(key)) {
+            this.description.delete(key);
+        } else if (key === "DEF") {
+            for (const inner of this.description.get(key).keys() ?? []) {
+                if (
+                    !this.description.get(key).get(inner)
+                    || !await Description.findById(inner)
+                ) {
+                    this.description.get(key).delete(inner);
+                }
+            }
 
-        if (!res) {
-            delete this.description[key];
+            if (this.description.get(key).size === 0) {
+                this.description.delete(key);
+            }
+        } else {
+            await Lang.findById(key) ?? this.description.delete(key);
         }
     }
-
-    this.description = this.description.filter(item => item);
 
     next();
 }

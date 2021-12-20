@@ -2,21 +2,32 @@ const {Router} = require("express");
 const Content = require("../model/Content");
 const WrongIdError = require("../exception/WrongIdError");
 const router = Router();
-const contentQuery = require("../query/contentQuery");
 const {CONTENT, PUBLIC} = require("../permission/entity");
 const {GET, POST, PUT, DELETE} = require("../permission/method");
 const permissionCheck = require("../permission/check");
 const withCache = require("../cache/withCache");
+const contentQuery = require("../query/contentQuery");
 
 router.get(
     "/",
     permissionCheck([CONTENT, PUBLIC], GET),
-    withCache(CONTENT),
+    // withCache(CONTENT),
     (req, res, next) => {
-        Content.find(
-            contentQuery.parseFilter(req.query.filter)
-        )
-            .then(result => res.json(result))
+        const {query: {filter, sort, limit, offset}} = req;
+        const parsedFilter = contentQuery.parseFilter(filter);
+        const parsedSort = contentQuery.parseSort(sort);
+
+        Promise.all([
+            Content.count(parsedFilter),
+            Content.find(parsedFilter)
+                .sort(parsedSort)
+                .limit(+limit)
+                .skip(+offset)
+        ])
+            .then(([count, result]) => {
+                res.header("total-row-count", count);
+                res.json(result);
+            })
             .catch(next);
     }
 );

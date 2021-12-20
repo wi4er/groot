@@ -1,22 +1,5 @@
 const mongoose = require("mongoose");
 const Status = require("./Status");
-const Property = require("./Property");
-const Lang = require("./Lang");
-
-const DirectoryPropertySchema = new mongoose.Schema({
-    value: {
-        type: [String],
-        validate: v => v.length > 0,
-    },
-    property: {
-        type: String,
-        ref: Property,
-    },
-    lang: {
-        type: String,
-        ref: Lang,
-    },
-});
 
 const DirectorySchema = new mongoose.Schema({
     _id: {
@@ -27,7 +10,13 @@ const DirectorySchema = new mongoose.Schema({
         type: String,
         ref: Status,
     }],
-    property: [DirectoryPropertySchema],
+    property: {
+        type: Map,
+        of: {
+            type: Map,
+            of: [String],
+        },
+    },
 });
 
 DirectorySchema.pre("save", require("../cleaner/propertyCleaner"));

@@ -6,8 +6,8 @@ afterEach(() => require(".").clearDatabase());
 beforeAll( () => require(".").connect());
 afterAll(() => require(".").disconnect());
 
-describe("Directory", function () {
-    describe("DirectoryValue fields", () => {
+describe("Value entity", function () {
+    describe("Value fields", () => {
         test("Should create", async () => {
             await new Directory({_id: "Directory"}).save();
             const inst = await new DirectoryValue({
@@ -28,7 +28,7 @@ describe("Directory", function () {
         });
     });
 
-    describe("Directory value status", () => {
+    describe("Value with status", () => {
         test("Should create with status", async () => {
             await new Directory({_id: "DIRECTORY"}).save();
             await new Status({_id: "ACTIVE"}).save();

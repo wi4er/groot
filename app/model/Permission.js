@@ -13,7 +13,7 @@ const PermissionSchema = new mongoose.Schema({
         required: true,
     },
     group: {
-        type: Number,
+        type: String,
         required: true,
     },
 });
