@@ -156,51 +156,31 @@ describe("Content", () => {
     describe("Content with image", () => {
         test("Should create content with image", async () => {
             await new Image({_id: "PREVIEW"}).save();
+
             const inst = await new Content({
                 slug: "DATA",
-                image: [{
-                    url: "http://localhost/image.jpg",
-                    image: "PREVIEW",
-                }]
+                image: {
+                    "PREVIEW": {
+                        url: "http://localhost/image.jpg",
+                    }
+                }
             }).save();
 
-            expect(inst.image).toHaveLength(1);
-            expect(inst.image[0].image).toBe("PREVIEW");
-        });
-
-        test("Should find content with image", async () => {
-            await new Image({_id: "PREVIEW"}).save()
-
-            await new Content({
-                slug: "DATA",
-                image: [{
-                    url: "http://localhost/image.jpg",
-                    image: "PREVIEW",
-                }]
-            }).save();
-
-            const item = await Content
-                .findOne({slug: "DATA"})
-                .populate({
-                    path: "image",
-                    populate: {path: "image"},
-                })
-                .exec();
-
-            expect(item.image.length).toBe(1);
-            expect(item.image[0].image._id).toBe("PREVIEW");
+            expect(inst.image.size).toBe(1);
+            expect(inst.image.get("PREVIEW")[0].url).toBe("http://localhost/image.jpg");
         });
 
         test("Shouldn't create content with wrong image", async () => {
             const inst = await new Content({
                 slug: "DATA",
-                image: [{
-                    url: "http://localhost/image.jpg",
-                    image: "WRONG",
-                }]
+                image: {
+                    "WRONG": {
+                        url: "http://localhost/image.jpg",
+                    }
+                }
             }).save();
 
-            expect(inst.image).toHaveLength(0);
+            expect(inst.image.size).toBe(0);
         });
     });
 

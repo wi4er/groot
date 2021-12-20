@@ -1,15 +1,9 @@
+const Image = require("../model/Image");
+
 module.exports = async function(next) {
-    const Image = require("../model/Image");
-
-    for (const key in this.image) {
-        const res = await Image.findById(this.image[key].image);
-
-        if (!res) {
-            delete this.image[key];
-        }
+    for (const key of this.image?.keys() ?? []) {
+        await Image.findById(key) ?? this.image.delete(key);
     }
-
-    this.image = this.image.filter(item => item);
 
     next();
 }

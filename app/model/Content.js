@@ -6,12 +6,7 @@ const Value = require("./Value");
 const Directory = require("./Directory");
 
 const ContentImageSchema = new mongoose.Schema({
-    url: [String],
-    image: {
-        type: String,
-        ref: Image,
-        required: true,
-    },
+    url: String,
 });
 
 const ContentDirectorySchema = new mongoose.Schema({
@@ -43,7 +38,10 @@ const ContentSchema = new mongoose.Schema({
             of: [String],
         },
     },
-    image: [ContentImageSchema],
+    image: {
+        type: Map,
+        of: [ContentImageSchema]
+    },
     directory: [ContentDirectorySchema],
     status: [{
         type: String,

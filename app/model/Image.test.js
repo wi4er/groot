@@ -14,6 +14,12 @@ describe("Image entity", function () {
             expect(inst._id).toBe("DETAIL");
         });
 
+        test("Should't create with empty id", async () => {
+            await expect(
+                new Image({_id: ""}).save()
+            ).rejects.toThrow();
+        });
+
         test("Should find list", async () => {
             for (let i = 1; i <= 5; i++) {
                 await new Image({_id: `value_${i}`}).save();

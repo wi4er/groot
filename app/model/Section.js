@@ -5,10 +5,6 @@ const  DirectoryValue = require("./Value");
 
 const SectionImageSchema = new mongoose.Schema({
     url: String,
-    image: {
-        type: String,
-        ref: Image
-    },
 });
 
 const SectionDirectorySchema = new mongoose.Schema({
@@ -35,7 +31,10 @@ const SectionSchema = new mongoose.Schema({
             of: [String],
         },
     },
-    image: [SectionImageSchema],
+    image: {
+        type: Map,
+        of: [SectionImageSchema]
+    },
     directory: [SectionDirectorySchema],
     status: [{
         type: String,

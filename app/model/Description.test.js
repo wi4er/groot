@@ -6,12 +6,18 @@ afterEach(() => require(".").clearDatabase());
 beforeAll( () => require(".").connect());
 afterAll(() => require(".").disconnect());
 
-describe("Description", function () {
+describe("Description entity", function () {
     describe("Description fields", () => {
         test("Should create", async () => {
             const inst = await new Description({_id: "DATA"}).save();
 
             expect(inst._id).toBe("DATA");
+        });
+
+        test("Shouldn't create with empty id", async () => {
+            await expect(
+                new Description({_id: ""}).save()
+            ).rejects.toThrow();
         });
 
         test("Should find one", async () => {

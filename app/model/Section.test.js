@@ -71,47 +71,28 @@ describe("Section", () => {
             await new Image({_id: "PREVIEW"}).save();
             const inst = await new Section({
                 slug: "DATA",
-                image: [{
-                    url: "http://localhost/image.jpg",
-                    image: "PREVIEW",
-                }]
+                image: {
+                    "PREVIEW": {
+                        url: "http://localhost/image.jpg",
+                    }
+                }
             }).save();
 
-            expect(inst.image).toHaveLength(1);
-            expect(inst.image[0].image).toBe("PREVIEW");
+            expect(inst.image.size).toBe(1);
+            expect(inst.image.get("PREVIEW")[0].url).toBe("http://localhost/image.jpg");
         });
 
-        test("Should find section with image", async () => {
-            await new Image({_id: "PREVIEW"}).save()
-
-            await new Section({
+        test("Should create section with wrong image", async () => {
+            const inst = await new Section({
                 slug: "DATA",
-                image: [{
-                    url: "http://localhost/image.jpg",
-                    image: "PREVIEW",
-                }]
+                image: {
+                    "WRONG": {
+                        url: "http://localhost/image.jpg",
+                    }
+                }
             }).save();
 
-            const item = await Section
-                .findOne({slug: "DATA"})
-                .populate({
-                    path: "image",
-                    populate: {path: "image"},
-                })
-                .exec();
-
-            expect(item.image.length).toBe(1);
-            expect(item.image[0].image._id).toBe("PREVIEW");
-        });
-
-        test("Shouldn't create section with wrong image", async () => {
-            new Section({
-                slug: "DATA",
-                image: [{
-                    url: "http://localhost/image.jpg",
-                    image: "WRONG",
-                }]
-            }).save().catch(() => done());
+            expect(inst.image.size).toBe(0);
         });
     });
 

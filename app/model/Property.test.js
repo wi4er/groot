@@ -14,6 +14,12 @@ describe("Property entity", function () {
 
             expect(inst._id).toBe("DATA");
         });
+
+        test("Shouldn't create with empty id", async () => {
+            await expect(
+                new Property({_id: ""}).save()
+            ).rejects.toThrow();
+        });
     });
 
     describe("Property with property", () => {
