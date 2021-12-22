@@ -241,35 +241,79 @@ describe("Content endpoint", function () {
     });
 
     describe("Content filter", () => {
-        test("Should fetch with status filter", async () => {
-            await request(app)
-                .post("/status/")
-                .send({_id: "NEW"})
-                .set(...require("./mock/auth"))
-                .expect(201);
+        describe("Content field filter", () => {
+            test("Should fetch with status filter", async () => {
+                for (let i = 0; i < 5; i++) {
+                    await request(app)
+                        .post("/content/")
+                        .send({slug: `VALUE_${i}`})
+                        .set(...require("./mock/auth"))
+                        .expect(201);
+                }
 
-            await request(app)
-                .post("/content/")
-                .send({slug: "VALUE_1", status: ["NEW"]})
-                .set(...require("./mock/auth"))
-                .expect(201);
+                await request(app)
+                    .get("/content/?filter=field-slug-in-VALUE_4")
+                    .expect(200)
+                    .set(...require("./mock/auth"))
+                    .then(result => {
+                        const body = JSON.parse(result.text);
 
-            await request(app)
-                .post("/content/")
-                .send({slug: "VALUE_2"})
-                .set(...require("./mock/auth"))
-                .expect(201);
+                        expect(body).toHaveLength(1);
+                        expect(body[0].slug).toBe("VALUE_4");
+                    });
+            });
 
-            await request(app)
-                .get("/content/?filter=status-in-NEW")
-                .expect(200)
-                .set(...require("./mock/auth"))
-                .then(result => {
-                    const body = JSON.parse(result.text);
+            test("Should fetch with status filter", async () => {
+                for (let i = 0; i < 5; i++) {
+                    await request(app)
+                        .post("/content/")
+                        .send({slug: `VALUE_${i}`})
+                        .set(...require("./mock/auth"))
+                        .expect(201);
+                }
 
-                    expect(body).toHaveLength(1);
-                    expect(body[0].slug).toBe("VALUE_1");
-                });
+                await request(app)
+                    .get("/content/?filter=field-slug-in-VALUE_2;VALUE_3")
+                    .expect(200)
+                    .set(...require("./mock/auth"))
+                    .then(result => {
+                        const body = JSON.parse(result.text);
+
+                        expect(body).toHaveLength(2);
+                        expect(body[0].slug).toBe("VALUE_2");
+                        expect(body[1].slug).toBe("VALUE_3");
+                    });
+            });
+        });
+
+        describe("Content status filter", () => {
+            test("Should fetch with status filter", async () => {
+                await request(app)
+                    .post("/status/")
+                    .send({_id: "NEW"})
+                    .set(...require("./mock/auth"))
+                    .expect(201);
+
+                for (let i = 0; i < 5; i++) {
+                    await request(app)
+                        .post("/content/")
+                        .send({slug: `VALUE_${i}`, status: i % 2 === 1 ? ["NEW"] : undefined})
+                        .set(...require("./mock/auth"))
+                        .expect(201);
+                }
+
+                await request(app)
+                    .get("/content/?filter=status-in-NEW")
+                    .expect(200)
+                    .set(...require("./mock/auth"))
+                    .then(result => {
+                        const body = JSON.parse(result.text);
+
+                        expect(body).toHaveLength(2);
+                        expect(body[0].slug).toBe("VALUE_1");
+                        expect(body[1].slug).toBe("VALUE_3");
+                    });
+            });
         });
     });
 
@@ -286,7 +330,7 @@ describe("Content endpoint", function () {
             }
 
             await request(app)
-                .get("/content/?sort=slug_asc")
+                .get("/content/?sort=field-slug-asc")
                 .set(...require("./mock/auth"))
                 .expect(200)
                 .then(res => {
@@ -315,7 +359,7 @@ describe("Content endpoint", function () {
             }
 
             await request(app)
-                .get("/content/?sort=status_STATUS_asc")
+                .get("/content/?sort=status-STATUS-asc")
                 .set(...require("./mock/auth"))
                 .expect(200)
                 .then(res => {

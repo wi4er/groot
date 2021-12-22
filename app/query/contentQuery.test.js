@@ -2,19 +2,19 @@ const contentQuery = require("./contentQuery");
 
 describe("Content query filter", function () {
     test("Should parse id filter", () => {
-        const filter = contentQuery.parseFilter("field_id-in-NAME");
+        const filter = contentQuery.parseFilter("field-id-in-NAME");
 
         expect(filter).toEqual({_id: {$in: ["NAME"]}});
     });
 
     test("Should parse slug filter", () => {
-        const filter = contentQuery.parseFilter("field_slug-in-SOMETHING");
+        const filter = contentQuery.parseFilter("field-slug-in-SOMETHING");
 
         expect(filter).toEqual({slug: {$in: ["SOMETHING"]}});
     });
 
     test("Should parse multi slug filter", () => {
-        const filter = contentQuery.parseFilter("field_slug-in-A;B;C");
+        const filter = contentQuery.parseFilter("field-slug-in-A;B;C");
 
         expect(filter).toEqual({slug: {$in: ["A", "B", "C"]}});
     });
