@@ -10,10 +10,21 @@ router.get(
     "/",
     permissionCheck([SECTION, PUBLIC], GET),
     (req, res, next) => {
-        Section.find(
-            require("../query/sectionQuery").parseFilter(req.query.filter)
-        )
-            .then(result => res.send(result))
+        const {query: {filter, sort, limit, offset}} = req;
+        const parsedFilter = require("../query/sectionQuery").parseFilter(filter)
+
+        Promise.all([
+            Section.count(parsedFilter),
+            Section.find(parsedFilter)
+                .limit(+limit)
+                .skip(+offset),
+        ])
+            .then(([count, result]) => {
+                res.header("total-row-count", count);
+                res.header("Access-Control-Expose-Headers", "total-row-count");
+
+                res.json(result);
+            })
             .catch(next);
     }
 );
@@ -28,7 +39,7 @@ router.get(
             .then(result => {
                 WrongIdError.assert(result, `Cant find section with id ${id}!`);
 
-                res.send(result);
+                res.json(result);
             })
             .catch(next);
     }
@@ -41,7 +52,7 @@ router.post(
         new Section(req.body).save()
             .then(inst => {
                 res.status(201);
-                res.send(inst);
+                res.json(inst);
             })
             .catch(next);
     }
@@ -61,7 +72,7 @@ router.put(
 
                 return Object.assign(result, req.body).save();
             })
-            .then(saved => res.send(saved))
+            .then(saved => res.json(saved))
             .catch(next);
     }
 );
@@ -78,7 +89,7 @@ router.delete(
 
                 return result.delete();
             })
-            .then(() => res.send(true))
+            .then(() => res.json(true))
             .catch(next);
     }
 );

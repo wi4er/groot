@@ -26,6 +26,8 @@ router.get(
         ])
             .then(([count, result]) => {
                 res.header("total-row-count", count);
+                res.header("Access-Control-Expose-Headers", "total-row-count");
+
                 res.json(result);
             })
             .catch(next);
