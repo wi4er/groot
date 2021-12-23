@@ -9,6 +9,12 @@ const filterList = {
     "status": (result, list) => {
         result["status"] = {$in: list};
     },
+    "property": (result, list, propertySlug) => {
+        result[`property.${propertySlug}`] = {$in: list};
+    },
+    "directory": (result, list, propertySlug) => {
+        result[`property.${propertySlug}`] = {$in: list};
+    },
 }
 
 const sortList = {

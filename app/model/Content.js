@@ -9,18 +9,6 @@ const ContentImageSchema = new mongoose.Schema({
     url: String,
 });
 
-const ContentDirectorySchema = new mongoose.Schema({
-    directory: {
-        type: String,
-        ref: Directory,
-        required: true,
-    },
-    value: [{
-        type: [String],
-        ref: Value,
-    }],
-});
-
 const ContentSchema = new mongoose.Schema({
     slug: String,
     timestamp: Date,
@@ -40,9 +28,15 @@ const ContentSchema = new mongoose.Schema({
     },
     image: {
         type: Map,
-        of: [ContentImageSchema]
+        of: [ContentImageSchema],
     },
-    directory: [ContentDirectorySchema],
+    directory: {
+        type: Map,
+        of: {
+            type: [String],
+            ref: Value,
+        }
+    },
     status: [{
         type: String,
         ref: Status,

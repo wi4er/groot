@@ -1,15 +1,25 @@
-module.exports = async function(next) {
+const Value = require("../model/Value");
+module.exports = async function (next) {
     const Directory = require("../model/Directory");
+    const Value = require("../model/Value");
 
-    for (const key in this.directory) {
-        const res = await Directory.findById(this.directory[key].directory);
+    for (const key of this.directory?.keys() ?? []) {
+        if (!await Directory.findById(key)) {
+            this.directory.delete(key);
+        } else {
+            let values = new Set(this.directory.get(key));
 
-        if (!res) {
-            delete this.directory[key];
+            for (const subKey of values) {
+                await Value.findById(subKey) ?? values.delete(subKey);
+            }
+
+            if (values.size) {
+                this.directory.set(key, [...values]);
+            } else {
+                this.directory.delete(key);
+            }
         }
     }
-
-    this.directory = this.directory.filter(item => item);
 
     next();
 }

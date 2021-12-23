@@ -5,7 +5,7 @@ const Description = require("./Description");
 const Status = require("./Status");
 const Lang = require("./Lang");
 const Directory = require("./Directory");
-const DirectoryValue = require("./Value");
+const Value = require("./Value");
 
 afterEach(() => require(".").clearDatabase());
 beforeAll(() => require(".").connect());
@@ -270,28 +270,87 @@ describe("Content", () => {
     describe("Content with directory", () => {
         test("Should create with directory", async () => {
             await new Directory({_id: "COLOR"}).save();
-            await new DirectoryValue({_id: "RED", directory: "COLOR"}).save();
+            await new Value({_id: "RED", directory: "COLOR"}).save();
 
             const inst = await new Content({
-                directory: [{
-                    directory: "COLOR",
-                    value: "RED"
-                }]}
-            ).save();
+                directory: {
+                    "COLOR": "RED"
+                }
+            }).save();
 
-            expect(inst.directory[0].value).toEqual(["RED"]);
-            expect(inst.directory[0].directory).toEqual("COLOR");
+            expect(inst.directory.get("COLOR")).toEqual(["RED"]);
+            expect(inst.directory.size).toBe(1);
         });
 
-        test("Should create with wrong directory directory", async () => {
-            const inst = await new Content({
-                directory: [{
-                    directory: "WRONG",
-                    value: "VALUE"
-                }]}
-            ).save();
+        test("Should create with wrong directory", async () => {
+            await new Directory({_id: "COLOR"}).save();
+            await new Value({_id: "RED", directory: "COLOR"}).save();
 
-            expect(inst.directory).toHaveLength(0);
+            const inst = await new Content({
+                directory: {
+                    "WRONG": "RED"
+                }
+            }).save();
+
+            expect(inst.directory.size).toBe(0);
+        });
+
+        test("Should create with wrong and correct directory", async () => {
+            await new Directory({_id: "COLOR"}).save();
+            await new Value({_id: "BLUE", directory: "COLOR"}).save();
+
+            const inst = await new Content({
+                directory: {
+                    "COLOR": "BLUE",
+                    "WRONG": "VALUE",
+                }
+            }).save();
+
+            expect(inst.directory.size).toBe(1);
+            expect(inst.directory.get("COLOR")).toEqual(["BLUE"]);
+        });
+
+        test("Should create with wrong and correct directory value", async () => {
+            await new Directory({_id: "COLOR"}).save();
+            await new Value({_id: "RED", directory: "COLOR"}).save();
+            await new Value({_id: "BLUE", directory: "COLOR"}).save();
+            await new Value({_id: "GREEN", directory: "COLOR"}).save();
+
+            const inst = await new Content({
+                directory: {
+                    "COLOR": ["BLUE", "RED", "WRONG", "GREEN"],
+                }
+            }).save();
+
+            expect(inst.directory.size).toBe(1);
+            expect(inst.directory.get("COLOR")).toEqual(["BLUE", "RED", "GREEN"]);
+        });
+
+        test("Should create with doubled directory value", async () => {
+            await new Directory({_id: "COLOR"}).save();
+            await new Value({_id: "RED", directory: "COLOR"}).save();
+
+            const inst = await new Content({
+                directory: {
+                    "COLOR": ["RED", "RED", "RED"],
+                }
+            }).save();
+
+            expect(inst.directory.size).toBe(1);
+            expect(inst.directory.get("COLOR")).toEqual(["RED"]);
+        });
+
+        test("Should create with wrong value", async () => {
+            await new Directory({_id: "COLOR"}).save();
+            await new Value({_id: "RED", directory: "COLOR"}).save();
+
+            const inst = await new Content({
+                directory: {
+                    "COLOR": "WRONG"
+                }
+            }).save();
+
+            expect(inst.directory.size).toBe(0);
         });
     });
 });

@@ -230,12 +230,58 @@ describe("Content endpoint", function () {
 
             await request(app)
                 .post("/content/")
-                .send({directory: {directory: "COLOR", value: "RED"}})
+                .send({directory: {"COLOR": "RED"}})
                 .set(...require("./mock/auth"))
                 .expect(201)
                 .then(res => {
-                    expect(res.body.directory).toHaveLength(1);
-                    expect(res.body.directory[0].value).toEqual(["RED"]);
+                    expect(Object.keys(res.body.directory)).toHaveLength(1);
+                    expect(res.body.directory["COLOR"]).toEqual(["RED"]);
+                });
+        });
+
+        test("Should add content with wrong directory", async () => {
+            await request(app)
+                .post("/directory/")
+                .send({_id: "COLOR"})
+                .set(...require("./mock/auth"))
+                .expect(201);
+
+            await request(app)
+                .post("/value/")
+                .send({_id: "RED", directory: "COLOR"})
+                .set(...require("./mock/auth"))
+                .expect(201);
+
+            await request(app)
+                .post("/content/")
+                .send({directory: {"WRONG": "RED"}})
+                .set(...require("./mock/auth"))
+                .expect(201)
+                .then(res => {
+                    expect(Object.keys(res.body.directory)).toHaveLength(0);
+                });
+        });
+
+        test("Should add content with wrong directory value", async () => {
+            await request(app)
+                .post("/directory/")
+                .send({_id: "COLOR"})
+                .set(...require("./mock/auth"))
+                .expect(201);
+
+            await request(app)
+                .post("/value/")
+                .send({_id: "RED", directory: "COLOR"})
+                .set(...require("./mock/auth"))
+                .expect(201);
+
+            await request(app)
+                .post("/content/")
+                .send({directory: {"COLOR": "WRONG"}})
+                .set(...require("./mock/auth"))
+                .expect(201)
+                .then(res => {
+                    expect(Object.keys(res.body.directory)).toHaveLength(0);
                 });
         });
     });
