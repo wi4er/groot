@@ -11,7 +11,7 @@ afterEach(() => require(".").clearDatabase());
 beforeAll(() => require(".").connect());
 afterAll(() => require(".").disconnect());
 
-describe("Content", () => {
+describe("Content entity", () => {
     describe("Content fields", function () {
         test("Should create", async () => {
             const inst = await new Content({

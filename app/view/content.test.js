@@ -85,6 +85,29 @@ describe("Content endpoint", function () {
                 });
         });
 
+        test("Should post item with doubled status", async () => {
+            await request(app)
+                .post("/status/")
+                .send({_id: "ACTIVE"})
+                .set(...require("./mock/auth"))
+                .expect(201);
+
+            await request(app)
+                .post("/content/")
+                .send({
+                    slug: "Some data",
+                    status: ["ACTIVE", "ACTIVE", "ACTIVE"],
+                })
+                .set(...require("./mock/auth"))
+                .expect(201)
+                .then(res => {
+                    const body = JSON.parse(res.text);
+
+                    expect(body.slug).toBe("Some data");
+                    expect(body.status).toEqual(["ACTIVE"]);
+                });
+        });
+
         test("Shouldn't post item with wrong status", async () => {
             await request(app)
                 .post("/status/")

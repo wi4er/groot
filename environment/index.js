@@ -20,10 +20,16 @@ class Environment {
         return process.env.DB_HOST || "localhost";
     }
 
+    /**
+     * Порт для базы данных
+     */
     get DB_PORT() {
         return process.env.DB_PORT || "27017";
     }
 
+    /**
+     * Имя базы банных
+     */
     get DB_NAME() {
         return process.env.DB_NAME || "content";
     }
@@ -42,6 +48,13 @@ class Environment {
 
     get CACHE_PATH() {
         return process.env.CACHE_PATH;
+    }
+
+    /**
+     * Разрешает доступ к публичным ендпоинтам
+     */
+    get GRAND_PUBLIC_GET() {
+        return process.env.GRAND_PUBLIC_GET || false;
     }
 }
 

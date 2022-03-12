@@ -16,6 +16,7 @@ describe("Section", () => {
             }).save();
 
             expect(inst.slug).toBe("DATA");
+            expect(inst.timestamp).not.toBeUndefined();
         });
     });
 

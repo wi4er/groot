@@ -1,7 +1,8 @@
 const env = require("./environment")
 const chalk = require("chalk");
+const http = require("http");
 
-require("./app").listen(env.PORT, err => {
+http.createServer(require("./app")).listen(env.PORT, err => {
     if (err) {
         console.log(chalk.bgRed(err));
     } else {

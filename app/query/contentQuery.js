@@ -12,8 +12,8 @@ const filterList = {
     "property": (result, list, propertySlug) => {
         result[`property.${propertySlug}`] = {$in: list};
     },
-    "directory": (result, list, propertySlug) => {
-        result[`property.${propertySlug}`] = {$in: list};
+    "directory": (result, list, directorySlug) => {
+        result[`directory.${directorySlug}`] = {$in: list};
     },
 }
 

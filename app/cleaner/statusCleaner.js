@@ -1,15 +1,12 @@
 module.exports = async function(next) {
     const Status = require("../model/Status");
+    const set = new Set(this.status);
 
-    for (const key in this.status) {
-        const res = await Status.findById(this.status[key]);
-
-        if (!res) {
-            delete this.status[key];
-        }
+    for (const key of set) {
+        await Status.findById(key) ?? set.delete(key);
     }
 
-    this.status = this.status.filter(item => item);
+    this.status = [...set];
 
     next();
 }
