@@ -19,6 +19,7 @@ try {
     app.use("/property/", require("./view/property"));
     app.use("/section/", require("./view/section"));
     app.use("/image/", require("./view/image"));
+    app.use("/event/", require("./view/event"));
 
     app.use(require("./exception"));
 

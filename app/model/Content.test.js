@@ -6,6 +6,7 @@ const Status = require("./Status");
 const Lang = require("./Lang");
 const Directory = require("./Directory");
 const Value = require("./Value");
+const Event = require("./Event");
 
 afterEach(() => require(".").clearDatabase());
 beforeAll(() => require(".").connect());
@@ -199,7 +200,7 @@ describe("Content entity", () => {
 
             expect(inst.description.size).toBe(1);
             expect(inst.description.get("DEF").size).toBe(1);
-            expect(inst.description.get("DEF").get("DETAIL")).toEqual(["TEXT"]);
+            expect(inst.description.get("DEF").get("DETAIL")).toEqual("TEXT");
         });
 
         test("Should create content with wrong description", async () => {
@@ -351,6 +352,44 @@ describe("Content entity", () => {
             }).save();
 
             expect(inst.directory.size).toBe(0);
+        });
+    });
+
+    describe("Content with event", () => {
+        test("Should create content with event", async () => {
+            await new Event({_id: "UPDATE"}).save();
+
+            const inst = await new Content({
+                event: {
+                    "UPDATE": "2000-01-01T12:00:00.000Z"
+                }
+            }).save();
+            
+            expect(inst.event.get("UPDATE").toISOString()).toEqual("2000-01-01T12:00:00.000Z");
+        });
+
+        test("Should create content with nonexistent event", async () => {
+            const inst = await new Content({
+                event: {
+                    "UPDATE": "2000-01-01T12:00:00.000Z"
+                }
+            }).save();
+
+            expect(inst.event.size).toBe(0);
+        });
+
+        test("Should create content with event and nonexistent event", async () => {
+            await new Event({_id: "UPDATE"}).save();
+
+            const inst = await new Content({
+                event: {
+                    "UPDATE": "2000-01-01T12:00:00.000Z",
+                    "WRONG": "2000-01-01T12:00:00.000Z",
+                }
+            }).save();
+
+            expect(inst.event.size).toBe(1);
+            expect(inst.event.get("UPDATE").toISOString()).toEqual("2000-01-01T12:00:00.000Z");
         });
     });
 });

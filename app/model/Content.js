@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
-const Image = require("./Image");
 const Section = require("./Section");
 const Status = require("./Status");
 const Value = require("./Value");
 const Directory = require("./Directory");
+const {Schema} = require("mongoose");
 
 const ContentImageSchema = new mongoose.Schema({
     url: String,
@@ -16,14 +16,14 @@ const ContentSchema = new mongoose.Schema({
         type: Map,
         of: {
             type: Map,
-            of: [String],
+            of: [Schema.Types.Mixed],
         },
     },
     description: {
         type: Map,
         of: {
             type: Map,
-            of: [String],
+            of: String,
         },
     },
     image: {
@@ -45,6 +45,10 @@ const ContentSchema = new mongoose.Schema({
         type: String,
         ref: Section,
     }],
+    event: {
+        type: Map,
+        of: Date,
+    },
 });
 
 ContentSchema.pre("save", require("../cleaner/propertyCleaner"));
@@ -52,6 +56,8 @@ ContentSchema.pre("save", require("../cleaner/descriptionCleaner"));
 ContentSchema.pre("save", require("../cleaner/statusCleaner"));
 ContentSchema.pre("save", require("../cleaner/imageCleaner"));
 ContentSchema.pre("save", require("../cleaner/directoryCleaner"));
+ContentSchema.pre("save", require("../cleaner/eventCleaner"));
+
 ContentSchema.pre("save", function (next) {
     this.timestamp = new Date();
 

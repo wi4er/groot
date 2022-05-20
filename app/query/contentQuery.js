@@ -10,11 +10,15 @@ const filterList = {
         result["status"] = {$in: list};
     },
     "property": (result, list, propertySlug) => {
-        result[`property.${propertySlug}`] = {$in: list};
+        // result[`property.DEF.${propertySlug}`] = {$in: list};
+        // result["property"] = {$elemMatch: {[propertySlug]: {$in: list}}};
     },
     "directory": (result, list, directorySlug) => {
         result[`directory.${directorySlug}`] = {$in: list};
     },
+    "event": (result, list, eventSlug) => {
+        result[`event.${eventSlug}`] = {$gt: list[0], $lt: list[1]};
+    }
 }
 
 const sortList = {

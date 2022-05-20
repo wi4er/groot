@@ -208,7 +208,7 @@ describe("Content endpoint", function () {
 
                     expect(body.slug).toBe("Some data");
                     expect(Object.keys(body.description)).toHaveLength(1);
-                    expect(body.description["DEF"]["SHORT"]).toEqual(["VALUE"]);
+                    expect(body.description["DEF"]["SHORT"]).toEqual("VALUE");
                 });
         });
 
@@ -309,6 +309,37 @@ describe("Content endpoint", function () {
         });
     });
 
+    describe("Contest with events", () => {
+        test("Should add content with event", async () => {
+            await request(app)
+                .post("/event/")
+                .send({_id: "CREATE"})
+                .set(...require("./mock/auth"))
+                .expect(201);
+
+            await request(app)
+                .post("/content/")
+                .send({event: {"CREATE": "2000-01-01T12:00:00.000Z"}})
+                .set(...require("./mock/auth"))
+                .expect(201)
+                .then(res => {
+                    expect(Object.keys(res.body.event)).toHaveLength(1);
+                    expect(res.body.event["CREATE"]).toEqual("2000-01-01T12:00:00.000Z");
+                });
+        });
+
+        test("Should add content with wrong event", async () => {
+            await request(app)
+                .post("/content/")
+                .send({event: {"CREATE": "2000-01-01T12:00:00.000Z"}})
+                .set(...require("./mock/auth"))
+                .expect(201)
+                .then(res => {
+                    expect(Object.keys(res.body.event)).toHaveLength(0);
+                });
+        });
+    });
+
     describe("Content filter", () => {
         describe("Content field filter", () => {
             test("Should fetch with status filter", async () => {
@@ -351,6 +382,45 @@ describe("Content endpoint", function () {
                         expect(body).toHaveLength(2);
                         expect(body[0].slug).toBe("VALUE_2");
                         expect(body[1].slug).toBe("VALUE_3");
+                    });
+            });
+        });
+
+        describe("Content property filter", () => {
+            test("Should fetch with property filter", async () => {
+                await request(app)
+                    .post("/property/")
+                    .send({_id: "VALUE"})
+                    .set(...require("./mock/auth"))
+                    .expect(201);
+
+                for (let i = 0; i < 10; i++) {
+                    await request(app)
+                        .post("/content/")
+                        .send({
+                            slug: `VALUE_${i}`,
+                            property: {
+                                "DEF": {
+                                    "VALUE": i % 2 ? "NUM_1" : "NUM_2"
+                                }
+                            }
+                        })
+                        .set(...require("./mock/auth"))
+                        .expect(201);
+                }
+
+                await request(app)
+                    .get("/content/?filter=property-VALUE-in-NUM_1")
+                    .set(...require("./mock/auth"))
+                    .expect(200)
+                    .then(res => {
+
+                        expect(res.body).toHaveLength(5);
+                        expect(res.body[0].slug).toBe("VALUE_1");
+                        expect(res.body[1].slug).toBe("VALUE_3");
+                        expect(res.body[2].slug).toBe("VALUE_5");
+                        expect(res.body[3].slug).toBe("VALUE_7");
+                        expect(res.body[4].slug).toBe("VALUE_9");
                     });
             });
         });
