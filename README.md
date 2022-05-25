@@ -7,7 +7,7 @@
 * **/directory/**
 * **/image/**
 * **/lang/**
-* **/permission/**
+* **/permission/**x
 * **/property/**
 * **/section/**
 * **/status/**

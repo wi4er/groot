@@ -10,14 +10,26 @@ const filterList = {
         result["status"] = {$in: list};
     },
     "property": (result, list, propertySlug) => {
-        // result[`property.DEF.${propertySlug}`] = {$in: list};
-        // result["property"] = {$elemMatch: {[propertySlug]: {$in: list}}};
+        result[`property.DEF.${propertySlug}`] = {$in: list};
     },
     "directory": (result, list, directorySlug) => {
         result[`directory.${directorySlug}`] = {$in: list};
     },
     "event": (result, list, eventSlug) => {
-        result[`event.${eventSlug}`] = {$gt: list[0], $lt: list[1]};
+        if (
+            !result[`event.${eventSlug}`]
+            && list.length > 0
+        ) {
+            result[`event.${eventSlug}`] = {};
+        }
+
+        if (list[0]) {
+            result[`event.${eventSlug}`].$gte = list[0];
+        }
+
+        if (list[1]) {
+            result[`event.${eventSlug}`].$lte = list[1];
+        }
     }
 }
 

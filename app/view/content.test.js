@@ -414,7 +414,6 @@ describe("Content endpoint", function () {
                     .set(...require("./mock/auth"))
                     .expect(200)
                     .then(res => {
-
                         expect(res.body).toHaveLength(5);
                         expect(res.body[0].slug).toBe("VALUE_1");
                         expect(res.body[1].slug).toBe("VALUE_3");
@@ -451,6 +450,99 @@ describe("Content endpoint", function () {
                         expect(body).toHaveLength(2);
                         expect(body[0].slug).toBe("VALUE_1");
                         expect(body[1].slug).toBe("VALUE_3");
+                    });
+            });
+        });
+
+        describe("Content event filter", () => {
+            test("Should filter by greater event", async () => {
+                await request(app)
+                    .post("/event/")
+                    .send({_id: "UPDATE"})
+                    .set(...require("./mock/auth"))
+                    .expect(201);
+
+                for (let i = 1; i <= 5; i++) {
+                    await request(app)
+                        .post("/content/")
+                        .send({
+                            slug: `VALUE_${i}`,
+                            event: {
+                                "UPDATE": `2000-0${i}-01T12:00:00.000Z`
+                            }
+                        })
+                        .set(...require("./mock/auth"))
+                        .expect(201);
+                }
+
+                await request(app)
+                    .get("/content/?filter=event-UPDATE-in-2000-02-01T12:00:00.000Z")
+                    .set(...require("./mock/auth"))
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body).toHaveLength(4);
+                        expect(res.body[0].slug).toBe("VALUE_2");
+                    });
+            });
+
+            test("Should filter by lower event", async () => {
+                await request(app)
+                    .post("/event/")
+                    .send({_id: "UPDATE"})
+                    .set(...require("./mock/auth"))
+                    .expect(201);
+
+                for (let i = 1; i <= 5; i++) {
+                    await request(app)
+                        .post("/content/")
+                        .send({
+                            slug: `VALUE_${i}`,
+                            event: {
+                                "UPDATE": `2000-0${i}-01T12:00:00.000Z`
+                            }
+                        })
+                        .set(...require("./mock/auth"))
+                        .expect(201);
+                }
+
+                await request(app)
+                    .get("/content/?filter=event-UPDATE-in-;2000-03-01T12:00:00.000Z")
+                    .set(...require("./mock/auth"))
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body).toHaveLength(3);
+                        expect(res.body[2].slug).toBe("VALUE_3");
+                    });
+            });
+
+            test("Should filter by event interval", async () => {
+                await request(app)
+                    .post("/event/")
+                    .send({_id: "UPDATE"})
+                    .set(...require("./mock/auth"))
+                    .expect(201);
+
+                for (let i = 1; i <= 5; i++) {
+                    await request(app)
+                        .post("/content/")
+                        .send({
+                            slug: `VALUE_${i}`,
+                            event: {
+                                "UPDATE": `2000-0${i}-01T12:00:00.000Z`
+                            }
+                        })
+                        .set(...require("./mock/auth"))
+                        .expect(201);
+                }
+
+                await request(app)
+                    .get("/content/?filter=event-UPDATE-in-2000-02-01T12:00:00.000Z;2000-04-01T12:00:00.000Z")
+                    .set(...require("./mock/auth"))
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body).toHaveLength(3);
+                        expect(res.body[0].slug).toBe("VALUE_2");
+                        expect(res.body[2].slug).toBe("VALUE_4");
                     });
             });
         });
