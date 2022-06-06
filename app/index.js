@@ -20,6 +20,7 @@ try {
     app.use("/section/", require("./view/section"));
     app.use("/image/", require("./view/image"));
     app.use("/event/", require("./view/event"));
+    app.use("/uniq/", require("./view/uniq"));
 
     app.use(require("./exception"));
 

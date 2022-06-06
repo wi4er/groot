@@ -9,14 +9,25 @@ const ContentImageSchema = new mongoose.Schema({
     url: String,
 });
 
+const ContentUniqSchema = new mongoose.Schema({
+    uniq: String,
+    value: {
+        type: String,
+        unique: true,
+    },
+});
+
 const ContentSchema = new mongoose.Schema({
     slug: String,
     timestamp: Date,
+    uniq: [ContentUniqSchema],
     property: {
         type: Map,
         of: {
             type: Map,
-            of: [Schema.Types.Mixed],
+            of: {
+                type: Schema.Types.Mixed,
+            },
         },
     },
     description: {
@@ -57,6 +68,7 @@ ContentSchema.pre("save", require("../cleaner/statusCleaner"));
 ContentSchema.pre("save", require("../cleaner/imageCleaner"));
 ContentSchema.pre("save", require("../cleaner/directoryCleaner"));
 ContentSchema.pre("save", require("../cleaner/eventCleaner"));
+ContentSchema.pre("save", require("../cleaner/uniqCleaner"));
 
 ContentSchema.pre("save", function (next) {
     this.timestamp = new Date();
@@ -64,4 +76,11 @@ ContentSchema.pre("save", function (next) {
     next();
 });
 
-module.exports = mongoose.model('content', ContentSchema);
+
+const model = mongoose.model('content', ContentSchema);
+
+model.once('index', err => {
+
+});
+
+module.exports = model;

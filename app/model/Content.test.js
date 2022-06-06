@@ -7,24 +7,116 @@ const Lang = require("./Lang");
 const Directory = require("./Directory");
 const Value = require("./Value");
 const Event = require("./Event");
+const Uniq = require("./Uniq");
 
 afterEach(() => require(".").clearDatabase());
 beforeAll(() => require(".").connect());
 afterAll(() => require(".").disconnect());
 
 describe("Content entity", () => {
-    describe("Content fields", function () {
+    describe("Content fields", () => {
         test("Should create", async () => {
+            const inst = await new Content({}).save();
+
+            // expect(inst.slug).toBe("DATA");
+        });
+    });
+
+    describe("Content with uniq", () => {
+        test("Should create with uniq", async () => {
+            await new Uniq({_id: "DATA"}).save();
+
             const inst = await new Content({
-                slug: "DATA",
+                uniq: {
+                    uniq: "DATA_1",
+                    value: "VALUE",
+                }
             }).save();
 
-            expect(inst.slug).toBe("DATA");
+            expect(inst.uniq[0].value).toBe("VALUE");
+        });
+
+        test("Should create many with uniq", async () => {
+            await new Uniq({_id: "DATA"}).save();
+
+            const inst = await new Content({
+                uniq: [{
+                    uniq: "DATA_1",
+                    value: "VALUE",
+                }, {
+                    uniq: "DATA_1",
+                    value: "VALUE",
+                }]
+            }).save();
+
+            expect(inst.uniq[0].value).toBe("VALUE");
+        });
+
+        test("Should be uniq", async () => {
+            await new Uniq({_id: "DATA_1"}).save();
+
+            await new Content({
+                uniq: [{
+                    uniq: "DATA_1",
+                    value: "VALUE",
+                }]
+            }).save();
+
+            await expect(new Content({
+                uniq: [{
+                    uniq: "DATA_1",
+                    value: "VALUE",
+                }]
+            }).save()).rejects.toThrow();
+        });
+
+        test("Should be uniq in different uniq", async () => {
+            await new Uniq({_id: "DATA_1"}).save();
+            await new Uniq({_id: "DATA_2"}).save();
+
+            await new Content({
+                uniq: [{
+                    uniq: "DATA_1",
+                    value: "VALUE",
+                }]
+            }).save();
+
+            await expect(new Content({
+                uniq: [{
+                    uniq: "DATA_2",
+                    value: "VALUE",
+                }]
+            }).save()).rejects.toThrow();
+        });
+
+        test("Should be uniq in many uniq", async () => {
+            await new Uniq({_id: "DATA_1"}).save();
+            await new Uniq({_id: "DATA_2"}).save();
+
+            await new Content({
+                uniq: [{
+                    uniq: "DATA_1",
+                    value: "VALUE_1",
+                }, {
+                    uniq: "DATA_2",
+                    value: "VALUE_2",
+                }]
+            }).save();
+
+            await expect(new Content({
+                uniq: [{
+                    uniq: "DATA_2",
+                    value: "VALUE_2",
+                }, {
+                    uniq: "DATA_2",
+                    value: "VALUE_1",
+                }]
+            }).save()).rejects.toThrow();
         });
     });
 
     describe("Content with property", () => {
-        test("Should create with property", async () => {
+        test("Should create with string property", async () => {
             await new Property({_id: "PROP"}).save();
 
             const inst = await new Content({
@@ -37,7 +129,39 @@ describe("Content entity", () => {
             }).save();
 
             expect(inst.property.size).toBe(1);
-            expect(inst.property.get("DEF").get("PROP")).toEqual(["VALUE"]);
+            expect(inst.property.get("DEF").get("PROP")).toEqual("VALUE");
+        });
+
+        test("Should create with number property", async () => {
+            await new Property({_id: "NUMBER"}).save();
+
+            const inst = await new Content({
+                slug: "DATA",
+                property: {
+                    "DEF": {
+                        "NUMBER": 333
+                    }
+                }
+            }).save();
+
+            expect(inst.property.size).toBe(1);
+            expect(inst.property.get("DEF").get("NUMBER")).toEqual(333);
+        });
+
+        test("Should create with boolean property", async () => {
+            await new Property({_id: "BOOL"}).save();
+
+            const inst = await new Content({
+                slug: "DATA",
+                property: {
+                    "DEF": {
+                        "BOOL": true
+                    }
+                }
+            }).save();
+
+            expect(inst.property.size).toBe(1);
+            expect(inst.property.get("DEF").get("BOOL")).toEqual(true);
         });
 
         test("Should create with wrong property", async () => {
@@ -85,7 +209,7 @@ describe("Content entity", () => {
 
             expect(inst.property.size).toBe(1);
             expect(inst.property.get("RU").size).toBe(1);
-            expect(inst.property.get("RU").get("PROP")).toEqual(["VALUE"]);
+            expect(inst.property.get("RU").get("PROP")).toEqual("VALUE");
         });
 
         test("Should create with wrong lang", async () => {
@@ -122,7 +246,7 @@ describe("Content entity", () => {
 
             expect(inst.property.size).toBe(1);
             expect(inst.property.get("RU").size).toBe(1);
-            expect(inst.property.get("RU").get("PROP")).toEqual(["VALUE"]);
+            expect(inst.property.get("RU").get("PROP")).toEqual("VALUE");
         });
 
         test("Should create with empty value", async () => {

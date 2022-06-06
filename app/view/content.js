@@ -30,12 +30,7 @@ router.get(
 
                 res.json(result);
             })
-            .catch(err => {
-                console.log(err);
-                
-                
-                next(err);
-            });
+            .catch(next);
     }
 );
 

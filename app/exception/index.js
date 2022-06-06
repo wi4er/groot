@@ -3,15 +3,17 @@ const PermissionError = require("./PermissionError");
 const WrongRefError = require("./WrongRefError");
 const {Error: {ValidationError}} = require("mongoose");
 const {MongoServerError} = require("mongodb")
+const {UnauthorizedError} = require("express-jwt");
 
 function formatError(err) {
     return {
-        message: err.message
+        message: err.message,
+        type: err.name,
     };
 }
 
 module.exports = (err, req, res, next) => {
-    console.log(err.message);
+    console.log(err);
 
     switch (err.constructor) {
         case WrongIdError: {
@@ -21,6 +23,12 @@ module.exports = (err, req, res, next) => {
         }
 
         case PermissionError: {
+            res.status(403);
+
+            break;
+        }
+
+        case UnauthorizedError: {
             res.status(403);
 
             break;

@@ -33,7 +33,9 @@ class Model {
     }
 
     getConnectionOptions() {
-        const options = {};
+        const options = {
+            serverSelectionTimeoutMS: 1000,
+        };
 
         if (env.USE_SSL) {
             options.ssl = true;

@@ -10,4 +10,5 @@ module.exports = {
     SECTION: "SECTION",
     STATUS: "STATUS",
     PUBLIC: "PUBLIC",
+    UNIQ: "UNIQ",
 };

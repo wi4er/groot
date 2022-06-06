@@ -4,10 +4,12 @@ afterEach(() => require(".").clearDatabase());
 beforeAll( () => require(".").connect());
 afterAll(() => require(".").disconnect());
 
-describe("Status", function () {
-    test("Should create", async () => {
-        const inst = await new Status({_id: "ST_3"}).save();
+describe("Status entity", () => {
+    describe("Status fields", () => {
+        test("Should create", async () => {
+            const inst = await new Status({_id: "ST_3"}).save();
 
-        expect(inst._id).toBe("ST_3");
+            expect(inst._id).toBe("ST_3");
+        });
     });
 });

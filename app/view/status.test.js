@@ -4,7 +4,7 @@ const app = require("..");
 afterEach(() => require("../model").clearDatabase());
 afterAll(() => require("../model").disconnect());
 
-describe("Status entity", function () {
+describe("Status endpoint", function () {
     describe("Status fields", () => {
         test("Should get empty list", async () => {
             await request(app)
@@ -109,5 +109,5 @@ describe("Status entity", function () {
                     console.log(err);
                 });
         });
-    })
+    });
 });

@@ -11,7 +11,7 @@ services:
       - ./init:/docker-entrypoint-initdb.d
 
   content:
-    image: node:latest
+    image: node:lts
     container_name: groot_api
     working_dir: /app
     command: npm start
@@ -19,6 +19,7 @@ services:
       DB_HOST: mongo
       DB_USER: content
       DB_PASSWORD: example
+      DB_NAME: content
       CACHE_HOST: cache
     links:
       - mongo
