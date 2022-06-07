@@ -52,6 +52,18 @@ describe("Content entity", () => {
             expect(inst.uniq[0].value).toBe("VALUE");
         });
 
+        test("Should create with empty uniq", async () => {
+            await new Uniq({_id: "DATA"}).save();
+
+            await new Content({
+                uniq: {}
+            }).save();
+
+            await new Content({
+                uniq: {}
+            }).save();
+        });
+
         test("Should be uniq", async () => {
             await new Uniq({_id: "DATA_1"}).save();
 

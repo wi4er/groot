@@ -15,6 +15,13 @@ const filterList = {
     "directory": (result, list, directorySlug) => {
         result[`directory.${directorySlug}`] = {$in: list};
     },
+    "uniq": (result, list, uniqSlug) => {
+        if (uniqSlug) {
+            result["uniq"] = {$elemMatch: {uniq: uniqSlug, value: {$in: list}}};
+        } else {
+            result["uniq.value"] = {$in: list};
+        }
+    },
     "event": (result, list, eventSlug) => {
         if (
             !result[`event.${eventSlug}`]

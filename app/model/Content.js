@@ -11,10 +11,7 @@ const ContentImageSchema = new mongoose.Schema({
 
 const ContentUniqSchema = new mongoose.Schema({
     uniq: String,
-    value: {
-        type: String,
-        unique: true,
-    },
+    value: String,
 });
 
 const ContentSchema = new mongoose.Schema({
@@ -76,11 +73,17 @@ ContentSchema.pre("save", function (next) {
     next();
 });
 
+ContentSchema.index(
+    {"uniq.value": 1},
+    {
+        unique: true,
+        partialFilterExpression: {"uniq.value": {$exists: true}},
+    }
+);
+
 
 const model = mongoose.model('content', ContentSchema);
 
-model.once('index', err => {
-
-});
+model.once('index', err => {});
 
 module.exports = model;

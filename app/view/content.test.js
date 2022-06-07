@@ -154,7 +154,7 @@ describe("Content endpoint", function () {
 
                     expect(body.slug).toBe("Some data");
                     expect(Object.keys(body.property)).toHaveLength(1);
-                    expect(body.property["DEF"]["NAME"]).toEqual(["VALUE"]);
+                    expect(body.property["DEF"]["NAME"]).toEqual("VALUE");
                 });
         });
 
@@ -543,6 +543,68 @@ describe("Content endpoint", function () {
                         expect(res.body).toHaveLength(3);
                         expect(res.body[0].slug).toBe("VALUE_2");
                         expect(res.body[2].slug).toBe("VALUE_4");
+                    });
+            });
+        });
+
+        describe("Content uniq filter", () => {
+            test("Should filter by email", async () => {
+                await request(app)
+                    .post("/uniq/")
+                    .send({_id: "EMAIL"})
+                    .set(...require("./mock/auth"))
+                    .expect(201);
+
+                for (let i = 1; i <= 5; i++) {
+                    await request(app)
+                        .post("/content/")
+                        .send({
+                            uniq: {
+                                uniq: "EMAIL",
+                                value: `VALUE_${i}`
+                            }
+                        })
+                        .set(...require("./mock/auth"))
+                        .expect(201);
+                }
+
+                await request(app)
+                    .get("/content/?filter=uniq-EMAIL-in-VALUE_3")
+                    .set(...require("./mock/auth"))
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body).toHaveLength(1);
+                        expect(res.body[0].uniq[0].value).toBe("VALUE_3");
+                    });
+            });
+
+            test("Should filter by uniq", async () => {
+                await request(app)
+                    .post("/uniq/")
+                    .send({_id: "EMAIL"})
+                    .set(...require("./mock/auth"))
+                    .expect(201);
+
+                for (let i = 1; i <= 5; i++) {
+                    await request(app)
+                        .post("/content/")
+                        .send({
+                            uniq: {
+                                uniq: "EMAIL",
+                                value: `VALUE_${i}`
+                            }
+                        })
+                        .set(...require("./mock/auth"))
+                        .expect(201);
+                }
+
+                await request(app)
+                    .get("/content/?filter=uniq-in-VALUE_5")
+                    .set(...require("./mock/auth"))
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body).toHaveLength(1);
+                        expect(res.body[0].uniq[0].value).toBe("VALUE_5");
                     });
             });
         });
