@@ -55,9 +55,6 @@ const ContentSchema = new mongoose.Schema({
         type: Map,
         of: Date,
     },
-}, {
-    autoCreate: true,
-    autoIndex: true
 });
 
 ContentSchema.pre("save", require("../cleaner/propertyCleaner"));
@@ -87,7 +84,5 @@ ContentSchema.index(
 );
 
 const model = mongoose.model('content', ContentSchema);
-
-model.ensureIndexes()
 
 module.exports = model;
