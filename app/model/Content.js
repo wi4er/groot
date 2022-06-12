@@ -2,22 +2,18 @@ const mongoose = require("mongoose");
 const Section = require("./Section");
 const Status = require("./Status");
 const Value = require("./Value");
-const Directory = require("./Directory");
 const {Schema} = require("mongoose");
 
-const ContentImageSchema = new mongoose.Schema({
-    url: String,
-});
-
-const ContentUniqSchema = new mongoose.Schema({
-    uniq: String,
-    value: String,
-});
-
 const ContentSchema = new mongoose.Schema({
-    slug: String,
     timestamp: Date,
-    uniq: [ContentUniqSchema],
+    created: {
+        type: Date,
+        immutable: true,
+    },
+    uniq: [{
+        uniq: String,
+        value: String,
+    }],
     property: {
         type: Map,
         of: {
@@ -36,7 +32,9 @@ const ContentSchema = new mongoose.Schema({
     },
     image: {
         type: Map,
-        of: [ContentImageSchema],
+        of: [{
+            url: String,
+        }],
     },
     directory: {
         type: Map,
@@ -57,6 +55,9 @@ const ContentSchema = new mongoose.Schema({
         type: Map,
         of: Date,
     },
+}, {
+    autoCreate: true,
+    autoIndex: true
 });
 
 ContentSchema.pre("save", require("../cleaner/propertyCleaner"));
@@ -70,6 +71,10 @@ ContentSchema.pre("save", require("../cleaner/uniqCleaner"));
 ContentSchema.pre("save", function (next) {
     this.timestamp = new Date();
 
+    if (this.isNew) {
+        this.created = new Date();
+    }
+
     next();
 });
 
@@ -81,9 +86,8 @@ ContentSchema.index(
     }
 );
 
-
 const model = mongoose.model('content', ContentSchema);
 
-model.once('index', err => {});
+model.ensureIndexes()
 
 module.exports = model;

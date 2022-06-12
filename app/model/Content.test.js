@@ -18,7 +18,27 @@ describe("Content entity", () => {
         test("Should create", async () => {
             const inst = await new Content({}).save();
 
-            // expect(inst.slug).toBe("DATA");
+            expect(inst.timestamp).not.toBeUndefined();
+            expect(inst.created).not.toBeUndefined();
+        });
+
+        test("Should create with created", async () => {
+            const inst = await new Content({
+                created: new Date("2022-01-01T00:00:00.000Z")
+            }).save();
+
+            expect(inst.created.toISOString()).not.toEqual("2022-01-01T00:00:00.000Z");
+        });
+
+        test("Shouldn't edit created", async () => {
+            const inst = await new Content({}).save();
+            const oldDate = inst.created;
+
+            inst.created = new Date();
+            await inst.save();
+            const newDate = inst.created;
+
+            expect(oldDate).toBe(newDate);
         });
     });
 

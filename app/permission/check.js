@@ -3,13 +3,16 @@ const PermissionError = require("../exception/PermissionError");
 const {PUBLIC} = require("./entity");
 const environment = require("../../environment");
 
-
 module.exports = (entity, method) => (req, res, next) => {
+    if (req.user?.admin) {
+        return next();
+    }
+
     if (
         entity.includes(PUBLIC)
         && environment.GRAND_PUBLIC_GET
     ) {
-        next();
+        return next();
     }
 
     Permission.findOne({
@@ -18,7 +21,7 @@ module.exports = (entity, method) => (req, res, next) => {
         group: {$in: req.user?.group},
     })
         .then(row => {
-            if (!row && !req.user?.admin) {
+            if (!row) {
                 next(new PermissionError("Permission denied!"));
             }
 

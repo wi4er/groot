@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 afterEach(() => require("../model").clearDatabase());
 afterAll(() => require("../model").disconnect());
 
-describe("Content endpoint", function () {
+describe("Content endpoint", () => {
     describe("Content fields", () => {
         test("Should get list", async () => {
             await request(app)
@@ -24,7 +24,8 @@ describe("Content endpoint", function () {
                 .set(...require("./mock/auth"))
                 .expect(201)
                 .then(res => {
-                    expect(JSON.parse(res.text).slug).toBe("Some data");
+                    expect(res.body.timestamp).not.toBeUndefined();
+                    expect(res.body.created).not.toBeUndefined();
                 });
         });
 
@@ -39,7 +40,7 @@ describe("Content endpoint", function () {
                 .set(...require("./mock/auth"))
                 .expect(200)
                 .then(res => {
-                    expect(JSON.parse(res.text).length).toBe(1);
+                    expect(res.body.length).toBe(1);
                 });
         });
 
@@ -47,7 +48,6 @@ describe("Content endpoint", function () {
             const id = await request(app)
                 .post("/content/")
                 .set(...require("./mock/auth"))
-                .send({slug: "SLUG"})
                 .expect(201)
                 .then(res => res.body._id);
 
@@ -56,8 +56,63 @@ describe("Content endpoint", function () {
                 .set(...require("./mock/auth"))
                 .expect(200)
                 .then(res => {
-                    expect(res.body.slug).toBe("SLUG");
+                    // expect(res.body.slug).toBe("SLUG");
                 });
+        });
+    });
+
+    describe("Content with uniq", () => {
+        test("Should post item with uniq", async () => {
+            await request(app)
+                .post("/uniq/")
+                .send({_id: "EMAIL"})
+                .set(...require("./mock/auth"))
+                .expect(201);
+
+            await request(app)
+                .post("/content/")
+                .send({
+                    uniq: [{
+                        uniq: "EMAIL",
+                        value: "123"
+                    }]
+                })
+                .set(...require("./mock/auth"))
+                .expect(201)
+                .then(res => {
+                    expect(res.body.uniq[0].uniq).toEqual("EMAIL");
+                    expect(res.body.uniq[0].value).toEqual("123");
+                });
+        });
+
+        test("Shouldn't post item with duplicate uniq", async () => {
+            await request(app)
+                .post("/uniq/")
+                .send({_id: "EMAIL"})
+                .set(...require("./mock/auth"))
+                .expect(201);
+
+            await request(app)
+                .post("/content/")
+                .send({
+                    uniq: [{
+                        uniq: "EMAIL",
+                        value: "123"
+                    }]
+                })
+                .set(...require("./mock/auth"))
+                .expect(201);
+
+            await request(app)
+                .post("/content/")
+                .send({
+                    uniq: [{
+                        uniq: "EMAIL",
+                        value: "123"
+                    }]
+                })
+                .set(...require("./mock/auth"))
+                .expect(400);
         });
     });
 
@@ -78,10 +133,7 @@ describe("Content endpoint", function () {
                 .set(...require("./mock/auth"))
                 .expect(201)
                 .then(res => {
-                    const body = JSON.parse(res.text);
-
-                    expect(body.slug).toBe("Some data");
-                    expect(body.status).toEqual(["ACTIVE"]);
+                    expect(res.body.status).toEqual(["ACTIVE"]);
                 });
         });
 
@@ -101,10 +153,7 @@ describe("Content endpoint", function () {
                 .set(...require("./mock/auth"))
                 .expect(201)
                 .then(res => {
-                    const body = JSON.parse(res.text);
-
-                    expect(body.slug).toBe("Some data");
-                    expect(body.status).toEqual(["ACTIVE"]);
+                    expect(res.body.status).toEqual(["ACTIVE"]);
                 });
         });
 
@@ -140,7 +189,6 @@ describe("Content endpoint", function () {
             await request(app)
                 .post("/content/")
                 .send({
-                    slug: "Some data",
                     property: {
                         "DEF": {
                             "NAME": "VALUE"
@@ -150,11 +198,8 @@ describe("Content endpoint", function () {
                 .set(...require("./mock/auth"))
                 .expect(201)
                 .then(result => {
-                    const body = JSON.parse(result.text);
-
-                    expect(body.slug).toBe("Some data");
-                    expect(Object.keys(body.property)).toHaveLength(1);
-                    expect(body.property["DEF"]["NAME"]).toEqual("VALUE");
+                    expect(Object.keys(result.body.property)).toHaveLength(1);
+                    expect(result.body.property["DEF"]["NAME"]).toEqual("VALUE");
                 });
         });
 
@@ -168,7 +213,6 @@ describe("Content endpoint", function () {
             await request(app)
                 .post("/content/")
                 .send({
-                    slug: "Some data",
                     property: {
                         "DEF": {
                             "ARTICLE": "VALUE"
@@ -194,7 +238,6 @@ describe("Content endpoint", function () {
             await request(app)
                 .post("/content/")
                 .send({
-                    slug: "Some data",
                     description: {
                         "DEF": {
                             "SHORT": "VALUE"
@@ -203,12 +246,9 @@ describe("Content endpoint", function () {
                 })
                 .set(...require("./mock/auth"))
                 .expect(201)
-                .then(result => {
-                    const body = JSON.parse(result.text);
-
-                    expect(body.slug).toBe("Some data");
-                    expect(Object.keys(body.description)).toHaveLength(1);
-                    expect(body.description["DEF"]["SHORT"]).toEqual("VALUE");
+                .then(res => {
+                    expect(Object.keys(res.body.description)).toHaveLength(1);
+                    expect(res.body.description["DEF"]["SHORT"]).toEqual("VALUE");
                 });
         });
 
@@ -222,7 +262,6 @@ describe("Content endpoint", function () {
             await request(app)
                 .post("/content/")
                 .send({
-                    slug: "Some data",
                     description: {
                         "DEF": {
                             "LONG": "VALUE"
@@ -341,51 +380,6 @@ describe("Content endpoint", function () {
     });
 
     describe("Content filter", () => {
-        describe("Content field filter", () => {
-            test("Should fetch with status filter", async () => {
-                for (let i = 0; i < 5; i++) {
-                    await request(app)
-                        .post("/content/")
-                        .send({slug: `VALUE_${i}`})
-                        .set(...require("./mock/auth"))
-                        .expect(201);
-                }
-
-                await request(app)
-                    .get("/content/?filter=field-slug-in-VALUE_4")
-                    .expect(200)
-                    .set(...require("./mock/auth"))
-                    .then(result => {
-                        const body = JSON.parse(result.text);
-
-                        expect(body).toHaveLength(1);
-                        expect(body[0].slug).toBe("VALUE_4");
-                    });
-            });
-
-            test("Should fetch with status filter", async () => {
-                for (let i = 0; i < 5; i++) {
-                    await request(app)
-                        .post("/content/")
-                        .send({slug: `VALUE_${i}`})
-                        .set(...require("./mock/auth"))
-                        .expect(201);
-                }
-
-                await request(app)
-                    .get("/content/?filter=field-slug-in-VALUE_2;VALUE_3")
-                    .expect(200)
-                    .set(...require("./mock/auth"))
-                    .then(result => {
-                        const body = JSON.parse(result.text);
-
-                        expect(body).toHaveLength(2);
-                        expect(body[0].slug).toBe("VALUE_2");
-                        expect(body[1].slug).toBe("VALUE_3");
-                    });
-            });
-        });
-
         describe("Content property filter", () => {
             test("Should fetch with property filter", async () => {
                 await request(app)
@@ -398,7 +392,6 @@ describe("Content endpoint", function () {
                     await request(app)
                         .post("/content/")
                         .send({
-                            slug: `VALUE_${i}`,
                             property: {
                                 "DEF": {
                                     "VALUE": i % 2 ? "NUM_1" : "NUM_2"
@@ -415,11 +408,6 @@ describe("Content endpoint", function () {
                     .expect(200)
                     .then(res => {
                         expect(res.body).toHaveLength(5);
-                        expect(res.body[0].slug).toBe("VALUE_1");
-                        expect(res.body[1].slug).toBe("VALUE_3");
-                        expect(res.body[2].slug).toBe("VALUE_5");
-                        expect(res.body[3].slug).toBe("VALUE_7");
-                        expect(res.body[4].slug).toBe("VALUE_9");
                     });
             });
         });
@@ -435,7 +423,9 @@ describe("Content endpoint", function () {
                 for (let i = 0; i < 5; i++) {
                     await request(app)
                         .post("/content/")
-                        .send({slug: `VALUE_${i}`, status: i % 2 === 1 ? ["NEW"] : undefined})
+                        .send({
+                            status: i % 2 === 1 ? ["NEW"] : undefined
+                        })
                         .set(...require("./mock/auth"))
                         .expect(201);
                 }
@@ -448,8 +438,6 @@ describe("Content endpoint", function () {
                         const body = JSON.parse(result.text);
 
                         expect(body).toHaveLength(2);
-                        expect(body[0].slug).toBe("VALUE_1");
-                        expect(body[1].slug).toBe("VALUE_3");
                     });
             });
         });
@@ -466,10 +454,7 @@ describe("Content endpoint", function () {
                     await request(app)
                         .post("/content/")
                         .send({
-                            slug: `VALUE_${i}`,
-                            event: {
-                                "UPDATE": `2000-0${i}-01T12:00:00.000Z`
-                            }
+                            event: {"UPDATE": `2000-0${i}-01T12:00:00.000Z`}
                         })
                         .set(...require("./mock/auth"))
                         .expect(201);
@@ -481,7 +466,6 @@ describe("Content endpoint", function () {
                     .expect(200)
                     .then(res => {
                         expect(res.body).toHaveLength(4);
-                        expect(res.body[0].slug).toBe("VALUE_2");
                     });
             });
 
@@ -496,10 +480,7 @@ describe("Content endpoint", function () {
                     await request(app)
                         .post("/content/")
                         .send({
-                            slug: `VALUE_${i}`,
-                            event: {
-                                "UPDATE": `2000-0${i}-01T12:00:00.000Z`
-                            }
+                            event: {"UPDATE": `2000-0${i}-01T12:00:00.000Z`}
                         })
                         .set(...require("./mock/auth"))
                         .expect(201);
@@ -511,7 +492,6 @@ describe("Content endpoint", function () {
                     .expect(200)
                     .then(res => {
                         expect(res.body).toHaveLength(3);
-                        expect(res.body[2].slug).toBe("VALUE_3");
                     });
             });
 
@@ -526,10 +506,7 @@ describe("Content endpoint", function () {
                     await request(app)
                         .post("/content/")
                         .send({
-                            slug: `VALUE_${i}`,
-                            event: {
-                                "UPDATE": `2000-0${i}-01T12:00:00.000Z`
-                            }
+                            event: {"UPDATE": `2000-0${i}-01T12:00:00.000Z`}
                         })
                         .set(...require("./mock/auth"))
                         .expect(201);
@@ -541,8 +518,6 @@ describe("Content endpoint", function () {
                     .expect(200)
                     .then(res => {
                         expect(res.body).toHaveLength(3);
-                        expect(res.body[0].slug).toBe("VALUE_2");
-                        expect(res.body[2].slug).toBe("VALUE_4");
                     });
             });
         });
@@ -611,28 +586,6 @@ describe("Content endpoint", function () {
     });
 
     describe("Content sorting", () => {
-        test("Should get with sort", async () => {
-            const slugs = ["AAA", "CCC", "BBB"];
-
-            for (let i = 0; i < 3; i++) {
-                await request(app)
-                    .post("/content/")
-                    .send({slug: `CONTENT_${slugs[i]}`})
-                    .set(...require("./mock/auth"))
-                    .expect(201);
-            }
-
-            await request(app)
-                .get("/content/?sort=field-slug-asc")
-                .set(...require("./mock/auth"))
-                .expect(200)
-                .then(res => {
-                    expect(res.body[0].slug).toBe("CONTENT_AAA");
-                    expect(res.body[1].slug).toBe("CONTENT_BBB");
-                    expect(res.body[2].slug).toBe("CONTENT_CCC");
-                });
-        });
-
         test("Should get with status sort", async () => {
             await request(app)
                 .post("/status/")
@@ -644,7 +597,6 @@ describe("Content endpoint", function () {
                 await request(app)
                     .post("/content/")
                     .send({
-                        slug: `CONTENT_${i}`,
                         status: [i % 2 === 0 ? "STATUS" : undefined],
                     })
                     .set(...require("./mock/auth"))
@@ -669,7 +621,6 @@ describe("Content endpoint", function () {
             for (let i = 0; i < 10; i++) {
                 await request(app)
                     .post("/content/")
-                    .send({slug: `CONTENT_${i}`})
                     .set(...require("./mock/auth"))
                     .expect(201);
             }
@@ -681,7 +632,6 @@ describe("Content endpoint", function () {
                 .then(res => {
                     expect(res.headers["total-row-count"]).toBe("10");
                     expect(res.body).toHaveLength(5);
-                    expect(res.body[4].slug).toBe("CONTENT_4");
                 });
         });
 
@@ -689,7 +639,6 @@ describe("Content endpoint", function () {
             for (let i = 0; i < 10; i++) {
                 await request(app)
                     .post("/content/")
-                    .send({slug: `CONTENT_${i}`})
                     .set(...require("./mock/auth"))
                     .expect(201);
             }
@@ -707,7 +656,6 @@ describe("Content endpoint", function () {
             for (let i = 0; i < 10; i++) {
                 await request(app)
                     .post("/content/")
-                    .send({slug: `CONTENT_${i}`})
                     .set(...require("./mock/auth"))
                     .expect(201);
             }
@@ -719,7 +667,6 @@ describe("Content endpoint", function () {
                 .then(res => {
                     expect(res.headers["total-row-count"]).toBe("10");
                     expect(res.body).toHaveLength(6);
-                    expect(res.body[0].slug).toBe("CONTENT_4");
                 });
         });
 
@@ -727,7 +674,6 @@ describe("Content endpoint", function () {
             for (let i = 0; i < 10; i++) {
                 await request(app)
                     .post("/content/")
-                    .send({slug: `CONTENT_${i}`})
                     .set(...require("./mock/auth"))
                     .expect(201);
             }
@@ -739,7 +685,6 @@ describe("Content endpoint", function () {
                 .then(res => {
                     expect(res.headers["total-row-count"]).toBe("10");
                     expect(res.body).toHaveLength(3);
-                    expect(res.body[0].slug).toBe("CONTENT_3");
                 });
         });
     });

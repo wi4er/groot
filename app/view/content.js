@@ -53,10 +53,7 @@ router.get(
 router.post(
     "/",
     permissionCheck([CONTENT, PUBLIC], POST),
-    withCache(),
     (req, res, next) => {
-        res.clearKey(CONTENT);
-
         new Content(req.body).save()
             .then(inst => {
                 res.status(201);
@@ -69,7 +66,6 @@ router.post(
 router.put(
     "/:id/",
     permissionCheck([CONTENT, PUBLIC], PUT),
-    withCache(),
     (req, res, next) => {
         const {params: {id}} = req;
 
@@ -78,7 +74,6 @@ router.put(
         Content.findById(id)
             .then(result => {
                 WrongIdError.assert(result, `Cant update content with id ${id}!`);
-                res.clearKey(CONTENT);
 
                 return Object.assign(result, req.body).save();
             })
@@ -90,18 +85,19 @@ router.put(
 router.delete(
     "/:id/",
     permissionCheck([CONTENT, PUBLIC], DELETE),
-    withCache(),
     (req, res, next) => {
         const {params: {id}} = req;
 
         Content.findById(id)
-            .then(result => {
+            .then(async result => {
                 WrongIdError.assert(result, `Cant delete content with id ${id}!`);
-                res.clearKey(CONTENT);
 
-                return result.delete();
+                if (await result.delete()) {
+
+                }
+
+                return res.json(result);
             })
-            .then(() => res.json(true))
             .catch(next);
     }
 );

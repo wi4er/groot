@@ -6,13 +6,12 @@ function sendEntity(entity, item) {
 
         const req = http.request({
             hostname: 'localhost',
-            port: 8081,
+            port: 8080,
             path: `/${entity}/`,
             method: 'Post',
             headers: {
                 'Content-Type': 'application/json',
                 "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiYWRtaW4iOnRydWUsImlhdCI6MTYzNzA2MzIzNn0.xj03Bc4nVh47rPO22FNjkptP7Or9iTOSPtAZc2ef2Dg",
-                'Content-Length': data.length
             }
         }, res => {
             res.on('data', response => {
@@ -58,28 +57,34 @@ async function populate() {
         })
     }
 
+    for (let i = 0; i < 10; i++) {
+        await sendEntity("uniq", {
+            _id: `UNIQ_${String(i).padStart(2, "0")}`
+        }).then(res => {
+            console.log(res);
+        })
+    }
+
     for (let i = 0; i < 1000; i++) {
         await sendEntity("content", {
-            property: [{
-                property: `PROPERTY_${String(Math.random() * 10 >> 0).padStart(2, "0")}`,
-                value: Math.random().toString(36).slice(2),
-            }, {
-                property: `PROPERTY_${String(Math.random() * 10 >> 0).padStart(2, "0")}`,
-                value: Math.random().toString(36).slice(2),
-            }, {
-                property: `PROPERTY_${String(Math.random() * 10 >> 0).padStart(2, "0")}`,
-                value: Math.random().toString(36).slice(2),
+            uniq: [{
+                uniq: `UNIQ_${String(Math.random() * 10 >> 0).padStart(2, "0")}`,
+                value: i,
             }],
-            description: [{
-                description: `DESCRIPTION_${String(Math.random() * 5 >> 0).padStart(2, "0")}`,
-                value: Math.random().toString(36).slice(2),
-            }, {
-                description: `DESCRIPTION_${String(Math.random() * 5 >> 0).padStart(2, "0")}`,
-                value: Math.random().toString(36).slice(2),
-            }, {
-                description: `DESCRIPTION_${String(Math.random() * 5 >> 0).padStart(2, "0")}`,
-                value: Math.random().toString(36).slice(2),
-            }],
+            property: {
+                DEF: {
+                    [`PROPERTY_${String(Math.random() * 10 >> 0).padStart(2, "0")}`]: Math.random().toString(36).slice(2),
+                    [`PROPERTY_${String(Math.random() * 10 >> 0).padStart(2, "0")}`]: Math.random().toString(36).slice(2),
+                    [`PROPERTY_${String(Math.random() * 10 >> 0).padStart(2, "0")}`]: Math.random().toString(36).slice(2),
+                }
+            },
+            description: {
+                DEF: {
+                    [`DESCRIPTION_${String(Math.random() * 5 >> 0).padStart(2, "0")}`]: Math.random().toString(36).slice(2),
+                    [`DESCRIPTION_${String(Math.random() * 5 >> 0).padStart(2, "0")}`]: Math.random().toString(36).slice(2),
+                    [`DESCRIPTION_${String(Math.random() * 5 >> 0).padStart(2, "0")}`]: Math.random().toString(36).slice(2),
+                }
+            },
             status: [
                 `STATUS_${String(Math.random() * 10 >> 0).padStart(2, "0")}`,
                 `STATUS_${String(Math.random() * 10 >> 0).padStart(2, "0")}`,
