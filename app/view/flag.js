@@ -1,6 +1,6 @@
 const {Router} = require("express");
 const router = Router();
-const Status = require("../model/Status");
+const Flag = require("../model/Flag");
 const statusQuery = require("../query/statusQuery");
 const WrongIdError = require("../exception/WrongIdError");
 const {STATUS, PUBLIC} = require("../permission/entity");
@@ -11,10 +11,10 @@ router.get(
     "/",
     permissionCheck([STATUS, PUBLIC], GET),
     (req, res, next) => {
-        Status.find(
+        Flag.find(
             statusQuery.parseFilter(req.query.filter)
         )
-            .then(result => res.send(result))
+            .then(result => res.json(result))
             .catch(next);
     }
 );
@@ -25,11 +25,11 @@ router.get(
     (req, res, next) => {
         const {params: {id}} = req;
 
-        Status.findById(id)
+        Flag.findById(id)
             .then(result => {
                 WrongIdError.assert(result, `Cant find status with id ${id}!`);
 
-                res.send(result);
+                res.json(result);
             })
             .catch(next);
     }
@@ -39,10 +39,10 @@ router.post(
     "/",
     permissionCheck([STATUS, PUBLIC], POST),
     (req, res, next) => {
-        new Status(req.body).save()
+        new Flag(req.body).save()
             .then(inst => {
                 res.status(201);
-                res.send(inst);
+                res.json(inst);
             })
             .catch(next);
     }
@@ -56,13 +56,13 @@ router.put(
 
         WrongIdError.assert(id === req.body._id, "Wrong id in body request");
 
-        Status.findById(id)
+        Flag.findById(id)
             .then(result => {
                 WrongIdError.assert(result, `Cant update status with id ${id}!`);
 
                 return Object.assign(result, req.body).save();
             })
-            .then(saved => res.send(saved))
+            .then(saved => res.json(saved))
             .catch(next);
     }
 );
@@ -73,13 +73,13 @@ router.delete(
     (req, res, next) => {
         const {params: {id}} = req;
 
-        Status.findById(id)
-            .then(result => {
-                WrongIdError.assert(result, `Cant delete status with id ${id}!`);
+        Flag.findById(id)
+            .then(async flag => {
+                WrongIdError.assert(flag, `Cant delete status with id ${id}!`);
+                WrongIdError.assert(await flag.delete(), `Cant delete status with id ${id}!`);
 
-                return result.delete();
+                res.json(flag);
             })
-            .then(() => res.send(true))
             .catch(next);
     }
 );

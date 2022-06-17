@@ -4,6 +4,14 @@ const app = require("..");
 afterEach(() => require("../model").clearDatabase());
 afterAll(() => require("../model").disconnect());
 
+jest.mock("../../environment", () => ({
+    DB_USER: "content",
+    DB_PASSWORD: "example",
+    DB_HOST: "localhost",
+    DB_NAME: "content",
+    SECRET: "hello world !",
+}));
+
 describe("Event endpoint", () => {
     describe("Event fields", () => {
         test("Should get event list", async () => {
@@ -16,18 +24,22 @@ describe("Event endpoint", () => {
                 });
         });
 
-        test("Should post event", async () => {
+        test("Should add event", async () => {
             await request(app)
                 .post("/event/")
                 .set(...require("./mock/auth"))
                 .send({_id: "MODIFY"})
                 .expect(201)
                 .then(response => {
+
+                    console.log(response.body);
+
+
                     expect(response.body._id).toBe("MODIFY");
                 });
         });
 
-        test("Should put event", async () => {
+        test("Should update event", async () => {
             await request(app)
                 .post("/event/")
                 .set(...require("./mock/auth"))
@@ -56,7 +68,7 @@ describe("Event endpoint", () => {
                 .set(...require("./mock/auth"))
                 .expect(200)
                 .then(res => {
-                    expect(res.body).toBe(true);
+                    expect(res.body._id).toBe("MODIFY");
                 });
         });
     });

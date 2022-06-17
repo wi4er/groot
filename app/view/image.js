@@ -62,7 +62,7 @@ router.put(
 
                 return Object.assign(result, req.body).save();
             })
-            .then(saved => res.send(saved))
+            .then(saved => res.json(saved))
             .catch(next);
     }
 );
@@ -74,12 +74,12 @@ router.delete(
         const {params: {id}} = req;
 
         Image.findById(id)
-            .then(result => {
-                WrongIdError.assert(result, `Cant delete image with id ${id}!`);
+            .then(async image => {
+                WrongIdError.assert(image, `Cant delete image with id ${id}!`);
+                WrongIdError.assert(await image.delete(), `Cant delete image with id ${id}!`);
 
-                return result.delete();
+                res.json(image);
             })
-            .then(() => res.send(true))
             .catch(next);
     }
 );

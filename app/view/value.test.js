@@ -4,6 +4,14 @@ const app = require("..");
 afterEach(() => require("../model").clearDatabase());
 afterAll(() => require("../model").disconnect());
 
+jest.mock("../../environment", () => ({
+    DB_USER: "content",
+    DB_PASSWORD: "example",
+    DB_HOST: "localhost",
+    DB_NAME: "content",
+    SECRET: "hello world !",
+}));
+
 describe("Value endpoint", function () {
     describe("Value fields", () => {
         test("Should get list", async () => {
@@ -45,9 +53,40 @@ describe("Value endpoint", function () {
                     });
             });
         });
+
+        describe("Value deletion", () => {
+            test("Should delete value", async () => {
+                await request(app)
+                    .post("/directory/")
+                    .send({_id: "COLOR"})
+                    .set(...require("./mock/auth"))
+                    .expect(201);
+
+                await request(app)
+                    .post("/value/")
+                    .send({_id: "BLUE", directory: "COLOR"})
+                    .set(...require("./mock/auth"))
+                    .expect(201);
+
+                await request(app)
+                    .delete("/value/BLUE/")
+                    .set(...require("./mock/auth"))
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body._id).toBe("BLUE");
+                    });
+            });
+
+            test("Shouldn't delete value with wrong id", async () => {
+                await request(app)
+                    .delete("/value/WRONG/")
+                    .set(...require("./mock/auth"))
+                    .expect(404);
+            });
+        });
     });
 
-    describe("Directory value with status", () => {
+    describe("Directory value with flag", () => {
         test("Should get list", async () => {
             await request(app)
                 .post("/directory/")
@@ -56,23 +95,24 @@ describe("Value endpoint", function () {
                 .expect(201);
 
             await request(app)
-                .post("/status/")
+                .post("/flag/")
                 .send({_id: "ACTIVE"})
                 .set(...require("./mock/auth"))
-                .expect(201)
+                .expect(201);
 
             await request(app)
                 .post("/value/")
                 .send({
                     _id: "RED",
                     directory: "COLOR",
-                    status: "ACTIVE"
+                    flag: "ACTIVE",
                 })
                 .set(...require("./mock/auth"))
                 .expect(201)
                 .then(res => {
                     expect(res.body._id).toBe("RED");
                     expect(res.body.directory).toBe("COLOR");
+                    expect(res.body.flag).toEqual(["ACTIVE"]);
                 });
         });
     });

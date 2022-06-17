@@ -1,8 +1,6 @@
 const mongoose = require("mongoose");
-const Status = require("./Status");
+const Flag = require("./Flag");
 const Directory = require("./Directory");
-const Property = require("./Property");
-const Lang = require("./Lang");
 const WrongRefError = require("../exception/WrongRefError");
 
 const ValueSchema = new mongoose.Schema({
@@ -11,27 +9,29 @@ const ValueSchema = new mongoose.Schema({
         validate: v => v.length > 0,
     },
     timestamp: Date,
-    status: [{
+    created: {
+        type: Date,
+        immutable: true,
+    },
+    flag: [{
         type: String,
-        ref: Status,
+        ref: Flag,
     }],
     directory: {
         type: String,
         ref: Directory,
     },
-    property: {
-        type: Map,
-        of: {
-            type: Map,
-            of: [String],
-        },
-    },
+    property: require("./PropertyItem"),
 });
 
 ValueSchema.pre("save", require("../cleaner/propertyCleaner"));
-ValueSchema.pre("save", require("../cleaner/statusCleaner"));
+ValueSchema.pre("save", require("../cleaner/flagCleaner"));
 ValueSchema.pre("save", function (next) {
     this.timestamp = new Date();
+
+    if (this.isNew) {
+        this.created = new Date();
+    }
 
     next();
 });

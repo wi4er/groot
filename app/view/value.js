@@ -73,12 +73,12 @@ router.delete(
         const {params: {id}} = req;
 
         Value.findById(id)
-            .then(result => {
-                WrongIdError.assert(result, `Cant delete directory value with id ${id}!`);
+            .then(async value => {
+                WrongIdError.assert(value, `Cant delete directory value with id ${id}!`);
+                WrongIdError.assert(await value.delete(), `Cant delete directory value with id ${id}!`);
 
-                return result.delete();
+                res.json(value)
             })
-            .then(() => res.send(true))
             .catch(next);
     }
 );

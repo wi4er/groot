@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const Status = require("./Status");
+const Flag = require("./Flag");
 
 const DescriptionSchema = new mongoose.Schema({
     _id: {
@@ -7,23 +7,25 @@ const DescriptionSchema = new mongoose.Schema({
         validate: v => v.length > 0,
     },
     timestamp: Date,
-    status: [{
-        type: String,
-        ref: Status,
-    }],
-    property:  {
-        type: Map,
-        of: {
-            type: Map,
-            of: [String],
-        },
+    created: {
+        type: Date,
+        immutable: true,
     },
+    flag: [{
+        type: String,
+        ref: Flag,
+    }],
+    property: require("./PropertyItem"),
 });
 
 DescriptionSchema.pre("save", require("../cleaner/propertyCleaner"));
-DescriptionSchema.pre("save", require("../cleaner/statusCleaner"));
+DescriptionSchema.pre("save", require("../cleaner/flagCleaner"));
 DescriptionSchema.pre("save", function (next) {
     this.timestamp = new Date();
+
+    if (this.isNew) {
+        this.created = new Date();
+    }
 
     next();
 });

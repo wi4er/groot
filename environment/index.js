@@ -6,18 +6,18 @@ class Environment {
     }
 
     get DB_USER() {
-        return process.env.DB_USER || "content";
+        return process.env.DB_USER;
     }
 
     get DB_PASSWORD() {
-        return process.env.DB_PASSWORD || "example";
+        return process.env.DB_PASSWORD;
     }
 
     /**
      * Хост для базы данных
      */
     get DB_HOST() {
-        return process.env.DB_HOST || "localhost";
+        return process.env.DB_HOST;
     }
 
     /**
@@ -31,7 +31,7 @@ class Environment {
      * Имя базы банных
      */
     get DB_NAME() {
-        return process.env.DB_NAME || "content";
+        return process.env.DB_NAME;
     }
 
     get DB_URL() {

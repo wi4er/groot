@@ -23,7 +23,7 @@
 * **Permission**
 * **Property**
 * **Section**
-* **Status**
+* **Flag**
 * **Value**
 
 ## Environment variables

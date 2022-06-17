@@ -1,10 +1,17 @@
 const Image = require("./Image");
-const Status = require("./Status");
+const Flag = require("./Flag");
 const Property = require("./Property");
 
 afterEach(() => require(".").clearDatabase());
 beforeAll( () => require(".").connect());
 afterAll(() => require(".").disconnect());
+
+jest.mock("../../environment", () => ({
+    DB_USER: "content",
+    DB_PASSWORD: "example",
+    DB_HOST: "localhost",
+    DB_NAME: "content",
+}));
 
 describe("Image entity", function () {
     describe("Image fields", () => {
@@ -31,24 +38,24 @@ describe("Image entity", function () {
         });
     });
 
-    describe("Image with status", () => {
+    describe("Image with flag", () => {
         test("Should add with status", async () => {
-            await new Status({_id: "NEW"}).save();
+            await new Flag({_id: "NEW"}).save();
             const inst = await new Image({
                 _id: "DETAIL",
-                status: "NEW",
+                flag: "NEW",
             }).save();
 
-            expect(inst.status).toEqual(["NEW"]);
+            expect(inst.flag).toEqual(["NEW"]);
         });
 
         test("Should add with wrong status", async () => {
             const inst = await new Image({
                 _id: "DETAIL",
-                status: "NEW",
+                flag: "WRONG",
             }).save();
 
-            expect(inst.status).toHaveLength(0);
+            expect(inst.flag).toBeUndefined();
         });
     });
 
@@ -66,20 +73,16 @@ describe("Image entity", function () {
 
             expect(inst.property.size).toBe(1);
             expect(inst.property.get("DEF").size).toBe(1);
-            expect(inst.property.get("DEF").get("ARTICLE")).toEqual(["VALUE"]);
+            expect(inst.property.get("DEF").get("ARTICLE")).toEqual("VALUE");
         });
 
         test("Should add with wrong property", async () => {
             const inst = await new Image({
                 _id: "DETAIL",
-                property: {
-                    "DEF": {
-                        "WRONG": "VALUE"
-                    }
-                },
+                property: {"DEF": {"WRONG": "VALUE"}},
             }).save();
 
-            expect(inst.property.size).toBe(0);
+            expect(inst.property).toBeUndefined();
         });
     });
 });

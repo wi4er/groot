@@ -2,11 +2,18 @@ const Section = require("./Section");
 const Property = require("./Property");
 const Image = require("./Image");
 const Description = require("./Description");
-const Status = require("./Status");
+const Flag = require("./Flag");
 
 afterEach(() => require(".").clearDatabase());
 beforeAll(() => require(".").connect());
 afterAll(() => require(".").disconnect());
+
+jest.mock("../../environment", () => ({
+    DB_USER: "content",
+    DB_PASSWORD: "example",
+    DB_HOST: "localhost",
+    DB_NAME: "content",
+}));
 
 describe("Section", () => {
     describe("Section fields", function () {
@@ -129,21 +136,21 @@ describe("Section", () => {
         });
     });
 
-    describe("Section with status", () => {
+    describe("Section with flag", () => {
         test("Should create with status", async () => {
-            await new Status({_id: "ACTIVE"}).save();
-            const inst = await new Section({status: ["ACTIVE"]}).save();
+            await new Flag({_id: "ACTIVE"}).save();
+            const inst = await new Section({flag: ["ACTIVE"]}).save();
 
-            expect(inst.status).toEqual(["ACTIVE"]);
+            expect(inst.flag).toEqual(["ACTIVE"]);
         });
 
         test("Shouldn't create section with wrong status", async () => {
             const item = await new Section({
                 slug: "DATA",
-                status: ["WRONG"],
+                flag: ["WRONG"],
             }).save();
 
-            expect(item.status).toHaveLength(0);
+            expect(item.flag).toBeUndefined();
         });
     });
 });

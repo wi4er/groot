@@ -1,9 +1,16 @@
 const Property = require("./Property");
-const Status = require("./Status");
+const Flag = require("./Flag");
 
 afterEach(() => require(".").clearDatabase());
 beforeAll( () => require(".").connect());
 afterAll(() => require(".").disconnect());
+
+jest.mock("../../environment", () => ({
+    DB_USER: "content",
+    DB_PASSWORD: "example",
+    DB_HOST: "localhost",
+    DB_NAME: "content",
+}));
 
 describe("Property entity", function () {
     describe("Property fields", () => {
@@ -70,21 +77,25 @@ describe("Property entity", function () {
         });
     });
 
-    describe("Property with status", () => {
-        test("Should filter by status", async () => {
+    describe("Property with flag", () => {
+        test("Should create with flag", () => {
+
+        });
+
+        test("Should filter by flag", async () => {
             for (let i = 0; i < 3; i++) {
-                await new Status({_id: `Status_${i}`}).save();
+                await new Flag({_id: `Flag_${i}`}).save();
             }
 
             for (let i = 0; i < 10; i++) {
                 await new Property({
                     _id: `Property_${i}`,
-                    status: [`Status_${i % 3}`],
+                    flag: [`Flag_${i % 3}`],
                 }).save();
             }
 
             await Property.find({
-                status: "Status_1"
+                flag: "Flag_1"
             }).then(res => {
                 expect(res.length).toBe(3);
             });

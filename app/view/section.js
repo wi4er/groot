@@ -84,12 +84,12 @@ router.delete(
         const {id} = req.params;
 
         Section.findById(id)
-            .then(result => {
-                WrongIdError.assert(result, `Can't delete section with id ${id}!`);
+            .then(async section => {
+                WrongIdError.assert(section, `Can't delete section with id ${id}!`);
+                WrongIdError.assert(await section.delete(), `Can't delete section with id ${id}!`);
 
-                return result.delete();
+                res.json(section);
             })
-            .then(() => res.json(true))
             .catch(next);
     }
 );

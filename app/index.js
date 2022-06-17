@@ -15,7 +15,7 @@ try {
     app.use("/description/", require("./view/description"));
     app.use("/directory/", require("./view/directory"));
     app.use("/value/", require("./view/value"));
-    app.use("/status/", require("./view/status"));
+    app.use("/flag/", require("./view/flag"));
     app.use("/property/", require("./view/property"));
     app.use("/section/", require("./view/section"));
     app.use("/image/", require("./view/image"));

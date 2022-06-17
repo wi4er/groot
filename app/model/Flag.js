@@ -6,10 +6,18 @@ const StatusSchema = new mongoose.Schema({
         validate: v => v.length > 0,
     },
     timestamp: Date,
+    created: {
+        type: Date,
+        immutable: true,
+    },
 });
 
 StatusSchema.pre("save", function(next) {
     this.timestamp = new Date();
+
+    if (this.isNew) {
+        this.created = new Date();
+    }
 
     next();
 });

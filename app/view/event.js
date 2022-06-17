@@ -73,12 +73,12 @@ router.delete(
         const {params: {id}} = req;
 
         Event.findById(id)
-            .then(result => {
-                WrongIdError.assert(result, `Cant delete status with id ${id}!`);
+            .then(async event => {
+                WrongIdError.assert(event, `Cant delete status with id ${id}!`);
+                WrongIdError.assert(await event.delete(), `Cant delete status with id ${id}!`);
 
-                return result.delete();
+                res.json(event);
             })
-            .then(() => res.send(true))
             .catch(next);
     }
 );

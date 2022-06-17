@@ -2,16 +2,24 @@ const Content = require("./Content");
 const Property = require("./Property");
 const Image = require("./Image");
 const Description = require("./Description");
-const Status = require("./Status");
+const Flag = require("./Flag");
 const Lang = require("./Lang");
 const Directory = require("./Directory");
 const Value = require("./Value");
 const Event = require("./Event");
 const Uniq = require("./Uniq");
+const Section = require("./Section");
 
 afterEach(() => require(".").clearDatabase());
 beforeAll(() => require(".").connect());
 afterAll(() => require(".").disconnect());
+
+jest.mock("../../environment", () => ({
+    DB_USER: "content",
+    DB_PASSWORD: "example",
+    DB_HOST: "localhost",
+    DB_NAME: "content",
+}));
 
 describe("Content entity", () => {
     describe("Content fields", () => {
@@ -20,6 +28,7 @@ describe("Content entity", () => {
 
             expect(inst.timestamp).not.toBeUndefined();
             expect(inst.created).not.toBeUndefined();
+            expect(inst._id.toString().length).toBe(24);
         });
 
         test("Should create with created", async () => {
@@ -150,9 +159,7 @@ describe("Content entity", () => {
     describe("Content with property", () => {
         test("Should create with string property", async () => {
             await new Property({_id: "PROP"}).save();
-
             const inst = await new Content({
-                slug: "DATA",
                 property: {
                     "DEF": {
                         "PROP": "VALUE"
@@ -166,9 +173,7 @@ describe("Content entity", () => {
 
         test("Should create with number property", async () => {
             await new Property({_id: "NUMBER"}).save();
-
             const inst = await new Content({
-                slug: "DATA",
                 property: {
                     "DEF": {
                         "NUMBER": 333
@@ -182,9 +187,7 @@ describe("Content entity", () => {
 
         test("Should create with boolean property", async () => {
             await new Property({_id: "BOOL"}).save();
-
             const inst = await new Content({
-                slug: "DATA",
                 property: {
                     "DEF": {
                         "BOOL": true
@@ -198,10 +201,9 @@ describe("Content entity", () => {
 
         test("Should create with wrong property", async () => {
             const inst = await new Content({
-                slug: "DATA",
                 property: {
                     "DEF": {
-                        "LABEL":  "VALUE_1"
+                        "LABEL": "VALUE_1"
                     }
                 }
             }).save();
@@ -217,7 +219,7 @@ describe("Content entity", () => {
                 property: {
                     "DEF": {
                         "PROP": "VALUE",
-                        "WRONG":  "VALUE"
+                        "WRONG": "VALUE"
                     }
                 }
             }).save();
@@ -231,7 +233,6 @@ describe("Content entity", () => {
             await new Lang({_id: "RU"}).save();
 
             const inst = await new Content({
-                slug: "DATA",
                 property: {
                     "RU": {
                         "PROP": "VALUE",
@@ -249,7 +250,6 @@ describe("Content entity", () => {
             await new Lang({_id: "RU"}).save();
 
             const inst = await new Content({
-                slug: "DATA",
                 property: {
                     "WRONG": {
                         "PROP": "VALUE",
@@ -265,7 +265,6 @@ describe("Content entity", () => {
             await new Lang({_id: "RU"}).save();
 
             const inst = await new Content({
-                slug: "DATA",
                 property: {
                     "WRONG": {
                         "PROP": "VALUE",
@@ -283,9 +282,7 @@ describe("Content entity", () => {
 
         test("Should create with empty value", async () => {
             await new Property({_id: "PROP"}).save();
-
             const inst = await new Content({
-                slug: "DATA",
                 property: {
                     "DEF": {
                         "PROP": undefined,
@@ -296,11 +293,24 @@ describe("Content entity", () => {
             expect(inst.property.size).toBe(0);
         });
 
+        test("Should create with nullable value", async () => {
+            await new Property({_id: "PROP"}).save();
+            const inst = await new Content({
+                property: {
+                    "DEF": {
+                        "PROP": null,
+                    }
+                }
+            }).save();
+
+            expect(inst.property.size).toBe(0);
+        });
+
+
         test("Should create with empty lang", async () => {
             await new Property({_id: "PROP"}).save();
 
             const inst = await new Content({
-                slug: "DATA",
                 property: {
                     "DEF": undefined,
                 }
@@ -344,7 +354,6 @@ describe("Content entity", () => {
     describe("Content with description", () => {
         test("Should create with description", async () => {
             await new Description({_id: "DETAIL"}).save()
-
             const inst = await new Content({
                 slug: "DATA",
                 description: {
@@ -406,21 +415,18 @@ describe("Content entity", () => {
         });
     });
 
-    describe("Content with status", () => {
+    describe("Content with flag", () => {
         test("Should create with status", async () => {
-            await new Status({_id: "ACTIVE"}).save();
-            const inst = await new Content({status: ["ACTIVE"]}).save();
+            await new Flag({_id: "ACTIVE"}).save();
+            const inst = await new Content({flag: ["ACTIVE"]}).save();
 
-            expect(inst.status).toEqual(["ACTIVE"]);
+            expect(inst.flag).toEqual(["ACTIVE"]);
         });
 
         test("Shouldn't create content with wrong status", async () => {
-            const inst = await new Content({
-                slug: "DATA",
-                status: ["WRONG"],
-            }).save();
+            const inst = await new Content({status: ["WRONG"]}).save();
 
-            expect(inst.status).toEqual([]);
+            expect(inst.flag).toBeUndefined();
         });
     });
 
@@ -520,7 +526,7 @@ describe("Content entity", () => {
                     "UPDATE": "2000-01-01T12:00:00.000Z"
                 }
             }).save();
-            
+
             expect(inst.event.get("UPDATE").toISOString()).toEqual("2000-01-01T12:00:00.000Z");
         });
 
@@ -546,6 +552,12 @@ describe("Content entity", () => {
 
             expect(inst.event.size).toBe(1);
             expect(inst.event.get("UPDATE").toISOString()).toEqual("2000-01-01T12:00:00.000Z");
+        });
+    });
+
+    describe("Content with section", () => {
+        test("Should create content with section", () => {
+
         });
     });
 });

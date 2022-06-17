@@ -4,6 +4,14 @@ const app = require("..");
 afterEach(() => require("../model").clearDatabase());
 afterAll(() => require("../model").disconnect());
 
+jest.mock("../../environment", () => ({
+    DB_USER: "content",
+    DB_PASSWORD: "example",
+    DB_HOST: "localhost",
+    DB_NAME: "content",
+    SECRET: "hello world !",
+}));
+
 describe("Uniq endpoint", function () {
     describe("Uniq fields", () => {
         test("Should get empty list", async () => {
@@ -66,14 +74,14 @@ describe("Uniq endpoint", function () {
                 .post("/uniq/")
                 .send({_id: "EMAIL"})
                 .set(...require("./mock/auth"))
-                .expect(201)
+                .expect(201);
 
             await request(app)
                 .delete(`/uniq/EMAIL/`)
                 .set(...require("./mock/auth"))
                 .expect(200)
                 .then(res => {
-                    expect(res.text).toBe("true");
+                    expect(res.body._id).toBe("EMAIL");
                 });
         });
 
@@ -81,7 +89,7 @@ describe("Uniq endpoint", function () {
             await request(app)
                 .delete(`/uniq/PASSIVE/`)
                 .set(...require("./mock/auth"))
-                .expect(404)
+                .expect(404);
         });
     });
 });

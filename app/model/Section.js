@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Image = require("./Image");
-const Status = require("./Status");
-const  DirectoryValue = require("./Value");
+const Flag = require("./Flag");
+const DirectoryValue = require("./Value");
 
 const SectionImageSchema = new mongoose.Schema({
     url: String,
@@ -17,18 +17,16 @@ const SectionDirectorySchema = new mongoose.Schema({
 const SectionSchema = new mongoose.Schema({
     slug: String,
     timestamp: Date,
-    property: {
-        type: Map,
-        of: {
-            type: Map,
-            of: [String],
-        },
+    created: {
+        type: Date,
+        immutable: true,
     },
+    property: require("./PropertyItem"),
     description: {
         type: Map,
         of: {
             type: Map,
-            of: [String],
+            of: String,
         },
     },
     image: {
@@ -36,19 +34,23 @@ const SectionSchema = new mongoose.Schema({
         of: [SectionImageSchema]
     },
     directory: [SectionDirectorySchema],
-    status: [{
+    flag: [{
         type: String,
-        ref: Status,
+        ref: Flag,
     }],
 });
 
 SectionSchema.pre("save", require("../cleaner/propertyCleaner"));
 SectionSchema.pre("save", require("../cleaner/descriptionCleaner"));
-SectionSchema.pre("save", require("../cleaner/statusCleaner"));
+SectionSchema.pre("save", require("../cleaner/flagCleaner"));
 SectionSchema.pre("save", require("../cleaner/imageCleaner"));
 SectionSchema.pre("save", require("../cleaner/directoryCleaner"));
 SectionSchema.pre("save", function (next) {
     this.timestamp = new Date();
+
+    if (this.isNew) {
+        this.created = new Date();
+    }
 
     next();
 });

@@ -1,9 +1,16 @@
-const
-    Lang = require("./Image");
+const Lang = require("./Image");
 
 afterEach(() => require(".").clearDatabase());
 beforeAll( () => require(".").connect());
 afterAll(() => require(".").disconnect());
+
+
+jest.mock("../../environment", () => ({
+    DB_USER: "content",
+    DB_PASSWORD: "example",
+    DB_HOST: "localhost",
+    DB_NAME: "content",
+}));
 
 describe("Lang entity", function () {
     describe("Lang fields", () => {

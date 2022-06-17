@@ -5,6 +5,14 @@ const jwt = require("jsonwebtoken");
 afterEach(() => require("../model").clearDatabase());
 afterAll(() => require("../model").disconnect());
 
+jest.mock("../../environment", () => ({
+    DB_USER: "content",
+    DB_PASSWORD: "example",
+    DB_HOST: "localhost",
+    DB_NAME: "content",
+    SECRET: "hello world !",
+}));
+
 describe("Content endpoint", () => {
     describe("Content fields", () => {
         test("Should get list", async () => {
@@ -116,8 +124,8 @@ describe("Content endpoint", () => {
         });
     });
 
-    describe("Content with status", () => {
-        test("Should post item with status", async () => {
+    describe("Content with flag", () => {
+        test("Should post item with flag", async () => {
             await request(app)
                 .post("/status/")
                 .send({_id: "ACTIVE"})
@@ -126,18 +134,15 @@ describe("Content endpoint", () => {
 
             await request(app)
                 .post("/content/")
-                .send({
-                    slug: "Some data",
-                    status: ["ACTIVE"],
-                })
+                .send({flag: ["ACTIVE"]})
                 .set(...require("./mock/auth"))
                 .expect(201)
                 .then(res => {
-                    expect(res.body.status).toEqual(["ACTIVE"]);
+                    expect(res.body.flag).toEqual(["ACTIVE"]);
                 });
         });
 
-        test("Should post item with doubled status", async () => {
+        test("Should post item with doubled flag", async () => {
             await request(app)
                 .post("/status/")
                 .send({_id: "ACTIVE"})
@@ -146,18 +151,15 @@ describe("Content endpoint", () => {
 
             await request(app)
                 .post("/content/")
-                .send({
-                    slug: "Some data",
-                    status: ["ACTIVE", "ACTIVE", "ACTIVE"],
-                })
+                .send({flag: ["ACTIVE", "ACTIVE", "ACTIVE"]})
                 .set(...require("./mock/auth"))
                 .expect(201)
                 .then(res => {
-                    expect(res.body.status).toEqual(["ACTIVE"]);
+                    expect(res.body.flag).toEqual(["ACTIVE"]);
                 });
         });
 
-        test("Shouldn't post item with wrong status", async () => {
+        test("Shouldn't post item with wrong flag", async () => {
             await request(app)
                 .post("/status/")
                 .send({_id: "ACTIVE"})
@@ -166,14 +168,11 @@ describe("Content endpoint", () => {
 
             await request(app)
                 .post("/content/")
-                .send({
-                    slug: "Some data",
-                    status: ["PASSIVE"],
-                })
+                .send({flag: ["PASSIVE"]})
                 .set(...require("./mock/auth"))
                 .expect(201)
                 .then(res => {
-                    expect(res.body.status).toHaveLength(0);
+                    expect(res.body.flag).toBeUndefined();
                 });
         });
     });
@@ -412,7 +411,7 @@ describe("Content endpoint", () => {
             });
         });
 
-        describe("Content status filter", () => {
+        describe("Content flag filter", () => {
             test("Should fetch with status filter", async () => {
                 await request(app)
                     .post("/status/")

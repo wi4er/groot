@@ -4,7 +4,15 @@ const app = require("..");
 afterEach(() => require("../model").clearDatabase());
 afterAll(() => require("../model").disconnect());
 
-describe("Property entity", function () {
+jest.mock("../../environment", () => ({
+    DB_USER: "content",
+    DB_PASSWORD: "example",
+    DB_HOST: "localhost",
+    DB_NAME: "content",
+    SECRET: "hello world !",
+}));
+
+describe("Property endpoint", function () {
     describe("Property fields", () => {
         describe("Getting items", () => {
             test("Should get empty list", async () => {
@@ -100,7 +108,7 @@ describe("Property entity", function () {
                     .set(...require("./mock/auth"))
                     .expect(200)
                     .then(res => {
-                        expect(res.text).toBe("true");
+                        expect(res.body._id).toBe("ACTIVE");
                     });
             });
 
@@ -113,10 +121,10 @@ describe("Property entity", function () {
         });
     });
 
-    describe("Property with status", () => {
+    describe("Property with flag", () => {
         test("Should add item with status", async () => {
             await request(app)
-                .post("/status/")
+                .post("/flag/")
                 .send({_id: "ACTIVE"})
                 .set(...require("./mock/auth"))
                 .expect(201);
@@ -125,19 +133,19 @@ describe("Property entity", function () {
                 .post("/property/")
                 .send({
                     _id: "NAME",
-                    status: ["ACTIVE"]
+                    flag: ["ACTIVE"]
                 })
                 .set(...require("./mock/auth"))
                 .expect(201)
                 .then(res => {
                     expect(res.body._id).toBe("NAME");
-                    expect(res.body.status).toEqual(["ACTIVE"]);
+                    expect(res.body.flag).toEqual(["ACTIVE"]);
                 });
         });
 
         test("Should update item with status", async () => {
             await request(app)
-                .post("/status/")
+                .post("/flag/")
                 .send({_id: "ACTIVE"})
                 .set(...require("./mock/auth"))
                 .expect(201);
@@ -146,7 +154,7 @@ describe("Property entity", function () {
                 .post("/property/")
                 .send({
                     _id: "NAME",
-                    status: ["ACTIVE"]
+                    flag: ["ACTIVE"]
                 })
                 .set(...require("./mock/auth"))
                 .expect(201);
@@ -155,12 +163,12 @@ describe("Property entity", function () {
                 .put("/property/NAME/")
                 .send({
                     _id: "NAME",
-                    status: []
+                    flag: []
                 })
                 .set(...require("./mock/auth"))
                 .expect(200)
                 .then(res => {
-                    expect(res.body.status).toEqual([]);
+                    expect(res.body.status).toBeUndefined();
                 });
         });
 
@@ -169,12 +177,12 @@ describe("Property entity", function () {
                 .post("/property/")
                 .send({
                     _id: "NAME",
-                    status: ["ACTIVE"]
+                    flag: ["ACTIVE"]
                 })
                 .set(...require("./mock/auth"))
                 .expect(201)
                 .then(res => {
-                    expect(res.body.status).toHaveLength(0);
+                    expect(res.body.flag).toBeUndefined();
                 });
         });
     });
@@ -201,7 +209,7 @@ describe("Property entity", function () {
                 .expect(201)
                 .then(result => {
                     expect(Object.keys(result.body.property)).toHaveLength(1);
-                    expect(result.body.property["DEF"]["NAME"]).toEqual(["SOMETHING"]);
+                    expect(result.body.property["DEF"]["NAME"]).toEqual("SOMETHING");
                 });
         });
 
@@ -217,9 +225,7 @@ describe("Property entity", function () {
                 .send({
                     _id: "WITH_NAME",
                     property: {
-                        "DEF": {
-                            "NAME": "SOMETHING"
-                        }
+                        "DEF": {"NAME": "SOMETHING"}
                     }
                 })
                 .set(...require("./mock/auth"))
@@ -230,16 +236,14 @@ describe("Property entity", function () {
                 .send({
                     _id: "WITH_NAME",
                     property: {
-                        "DEF": {
-                            "NAME": "UPDATED"
-                        }
+                        "DEF": {"NAME": "UPDATED"}
                     }
                 })
                 .set(...require("./mock/auth"))
                 .expect(200)
                 .then(result => {
                     expect(Object.keys(result.body.property)).toHaveLength(1);
-                    expect(result.body.property["DEF"]["NAME"]).toEqual(["UPDATED"]);
+                    expect(result.body.property["DEF"]["NAME"]).toEqual("UPDATED");
                 });
         });
 
@@ -257,7 +261,7 @@ describe("Property entity", function () {
                 .set(...require("./mock/auth"))
                 .expect(201)
                 .then(res => {
-                    expect(Object.keys(res.body.property)).toHaveLength(0);
+                    expect(res.body.property).toBeUndefined();
                 })
         });
     });

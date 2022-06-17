@@ -2,6 +2,10 @@ const mongoose = require("mongoose");
 
 const PermissionSchema = new mongoose.Schema({
     timestamp: Date,
+    created: {
+        type: Date,
+        immutable: true,
+    },
     entity: {
         type: String,
         enum: Object.values(require("../permission/entity")),
@@ -20,6 +24,10 @@ const PermissionSchema = new mongoose.Schema({
 
 PermissionSchema.pre("save", function(next) {
     this.timestamp = new Date();
+
+    if (this.isNew) {
+        this.created = new Date();
+    }
 
     next();
 });

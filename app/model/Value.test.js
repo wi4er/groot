@@ -1,10 +1,17 @@
 const DirectoryValue = require("./Value");
-const Status = require("./Status");
+const Flag = require("./Flag");
 const Directory = require("./Directory");
 
 afterEach(() => require(".").clearDatabase());
 beforeAll( () => require(".").connect());
 afterAll(() => require(".").disconnect());
+
+jest.mock("../../environment", () => ({
+    DB_USER: "content",
+    DB_PASSWORD: "example",
+    DB_HOST: "localhost",
+    DB_NAME: "content",
+}));
 
 describe("Value entity", function () {
     describe("Value fields", () => {
@@ -28,29 +35,29 @@ describe("Value entity", function () {
         });
     });
 
-    describe("Value with status", () => {
-        test("Should create with status", async () => {
+    describe("Value with flag", () => {
+        test("Should create with flag", async () => {
+            await new Flag({_id: "ACTIVE"}).save();
             await new Directory({_id: "DIRECTORY"}).save();
-            await new Status({_id: "ACTIVE"}).save();
 
             const inst = await new DirectoryValue({
                 _id: "VALUE",
                 directory: "DIRECTORY",
-                status: ["ACTIVE"],
+                flag: ["ACTIVE"],
             }).save();
 
-            expect(inst.status).toEqual(["ACTIVE"]);
+            expect(inst.flag).toEqual(["ACTIVE"]);
         });
 
-        test("Shouldn't create with wrong status", async () => {
+        test("Should create with wrong flag", async () => {
             await new Directory({_id: "DIRECTORY"}).save();
             const inst = await new DirectoryValue({
                 _id: "DIRECTORY",
                 directory: "DIRECTORY",
-                status: ["PASSIVE"],
+                flag: ["PASSIVE"],
             }).save();
 
-            expect(inst.status).toEqual([]);
+            expect(inst.flag).toBeUndefined();
         });
     });
 

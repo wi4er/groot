@@ -1,10 +1,18 @@
 const Description = require("./Description");
-const Status = require("./Status");
+const Flag = require("./Flag");
 const Property = require("./Property");
+const Directory = require("./Directory");
 
 afterEach(() => require(".").clearDatabase());
 beforeAll( () => require(".").connect());
 afterAll(() => require(".").disconnect());
+
+jest.mock("../../environment", () => ({
+    DB_USER: "content",
+    DB_PASSWORD: "example",
+    DB_HOST: "localhost",
+    DB_NAME: "content",
+}));
 
 describe("Description entity", function () {
     describe("Description fields", () => {
@@ -20,6 +28,16 @@ describe("Description entity", function () {
             await expect(new Description({}).save()).rejects.toThrow();
         });
 
+        test("Should update", async () => {
+            const inst = await new Description({_id: "DIRECTORY"}).save();
+
+            const {timestamp, created} = inst;
+            await inst.save();
+
+            expect(inst.timestamp).not.toBe(timestamp);
+            expect(inst.created).toBe(created);
+        });
+
         test("Should find one", async () => {
             await new Description({_id: "DATA"}).save();
 
@@ -28,32 +46,30 @@ describe("Description entity", function () {
         });
     });
 
-    describe("Description with status", () => {
-        test("Should create with status", async () => {
-            await new Status({_id: "ACTIVE"}).save();
-
+    describe("Description with flag", () => {
+        test("Should create with flag", async () => {
+            await new Flag({_id: "ACTIVE"}).save();
             const inst = await new Description({
                 _id: "DATA",
-                status: ["ACTIVE"],
+                flag: ["ACTIVE"],
             }).save();
 
-            expect(inst.status).toEqual(["ACTIVE"]);
+            expect(inst.flag).toEqual(["ACTIVE"]);
         });
 
         test("Shouldn't create with wrong status", async () => {
             const inst = await new Description({
                 _id: "DATA",
-                status: ["PASSIVE"],
+                flag: ["PASSIVE"],
             }).save();
 
-            expect(inst.status).toHaveLength(0);
+            expect(inst.flag).toBeUndefined();
         });
     });
 
     describe("Description with property", () => {
         test("Should create item with property", async () => {
             await new Property({_id: "NAME"}).save();
-
             const inst = await new Description({
                 _id: "DATA",
                 property: {
@@ -65,35 +81,26 @@ describe("Description entity", function () {
 
             expect(inst.property.size).toBe(1);
             expect(inst.property.get("DEF").size).toBe(1);
-            expect(inst.property.get("DEF").get("NAME")).toEqual(["PRODUCT"]);
+            expect(inst.property.get("DEF").get("NAME")).toEqual("PRODUCT");
         });
 
         test("Should create with wrong property", async () => {
             const inst = await new Description({
                 _id: "DATA",
-                property: {
-                    "DEF": {
-                        "WRONG": "PRODUCT"
-                    }
-                },
+                property: {"DEF": {"WRONG": "PRODUCT"}},
             }).save();
 
-            expect(inst.property.size).toBe(0);
+            expect(inst.property).toBeUndefined();
         });
 
         test("Should create with wrong lang", async () => {
             await new Property({_id: "NAME"}).save();
-
             const inst = await new Description({
                 _id: "DATA",
-                property: {
-                    "WRONG": {
-                        "NAME": "PRODUCT"
-                    }
-                },
+                property: {"WRONG": {"NAME": "PRODUCT"}},
             }).save();
 
-            expect(inst.property.size).toBe(0);
+            expect(inst.property).toBeUndefined();
         });
     });
 });

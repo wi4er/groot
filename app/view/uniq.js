@@ -11,8 +11,9 @@ router.get(
     permissionCheck([UNIQ, PUBLIC], GET),
     (req, res, next) => {
         Uniq.find(
+
         )
-            .then(result => res.send(result))
+            .then(result => res.json(result))
             .catch(next);
     }
 );
@@ -27,7 +28,7 @@ router.get(
             .then(result => {
                 WrongIdError.assert(result, `Cant find uniq with id ${id}!`);
 
-                res.send(result);
+                res.json(result);
             })
             .catch(next);
     }
@@ -40,7 +41,7 @@ router.post(
         new Uniq(req.body).save()
             .then(inst => {
                 res.status(201);
-                res.send(inst);
+                res.json(inst);
             })
             .catch(next);
     }
@@ -60,7 +61,7 @@ router.put(
 
                 return Object.assign(result, req.body).save();
             })
-            .then(saved => res.send(saved))
+            .then(saved => res.json(saved))
             .catch(next);
     }
 );
@@ -72,12 +73,12 @@ router.delete(
         const {params: {id}} = req;
 
         Uniq.findById(id)
-            .then(result => {
-                WrongIdError.assert(result, `Cant delete status with id ${id}!`);
+            .then(async uniq => {
+                WrongIdError.assert(uniq, `Cant delete status with id ${id}!`);
+                WrongIdError.assert(await uniq.delete(), `Cant delete status with id ${id}!`);
 
-                return result.delete();
+                res.json(uniq);
             })
-            .then(() => res.send(true))
             .catch(next);
     }
 );

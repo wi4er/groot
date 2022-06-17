@@ -14,7 +14,7 @@ router.get(
         Property.find(
             propertyQuery.parseFilter(req.query.filter)
         )
-            .then(result => res.send(result))
+            .then(result => res.json(result))
             .catch(next);
     }
 );
@@ -29,7 +29,7 @@ router.get(
             .then(result => {
                 WrongIdError.assert(result, `Cant find property with id ${id}!`);
 
-                res.send(result);
+                res.json(result);
             })
             .catch(next);
     }
@@ -42,7 +42,7 @@ router.post(
         new Property(req.body).save()
             .then(result => {
                 res.status(201);
-                res.send(result);
+                res.json(result);
             })
             .catch(next);
     }
@@ -62,7 +62,7 @@ router.put(
 
                 return Object.assign(result, req.body).save();
             })
-            .then(saved => res.send(saved))
+            .then(saved => res.json(saved))
             .catch(next);
     }
 );
@@ -74,12 +74,12 @@ router.delete(
         const {params: {id}} = req;
 
         Property.findById(id)
-            .then(result => {
-                WrongIdError.assert(result, `Cant delete property with id ${id}!`);
+            .then(async property => {
+                WrongIdError.assert(property, `Cant delete property with id ${id}!`);
+                WrongIdError.assert(await property.delete(), `Cant delete property with id ${id}!`);
 
-                return result.delete();
+                res.json(property);
             })
-            .then(() => res.send(true))
             .catch(next);
     }
 );

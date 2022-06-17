@@ -89,14 +89,11 @@ router.delete(
         const {params: {id}} = req;
 
         Content.findById(id)
-            .then(async result => {
-                WrongIdError.assert(result, `Cant delete content with id ${id}!`);
+            .then(async content => {
+                WrongIdError.assert(content, `Cant delete content with id ${id}!`);
+                WrongIdError.assert(await content.delete(), `Cant delete content with id ${id}!`);
 
-                if (await result.delete()) {
-
-                }
-
-                return res.json(result);
+                return res.json(content);
             })
             .catch(next);
     }

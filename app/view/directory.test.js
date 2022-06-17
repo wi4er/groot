@@ -4,8 +4,16 @@ const app = require("..");
 afterEach(() => require("../model").clearDatabase());
 afterAll(() => require("../model").disconnect());
 
-describe("Directory entity", function () {
-    describe("Directory get", () => {
+jest.mock("../../environment", () => ({
+    DB_USER: "content",
+    DB_PASSWORD: "example",
+    DB_HOST: "localhost",
+    DB_NAME: "content",
+    SECRET: "hello world !",
+}));
+
+describe("Directory endpoint", function () {
+    describe("Directory fields", () => {
         test("Should get list", async () => {
             await request(app)
                 .get("/directory/")
@@ -13,32 +21,52 @@ describe("Directory entity", function () {
                 .expect(200);
         });
 
-        test("Should post item", async () => {
-            await request(app)
-                .post("/directory/")
-                .send({_id: "Some data"})
-                .set(...require("./mock/auth"))
-                .expect(201)
-                .then(res => {
-                    expect(JSON.parse(res.text)._id).toBe("Some data");
-                });
-        });
-    });
-
-    test("Should post and get item", async () => {
-        await request(app)
-            .post("/directory/")
-            .send({_id: "DIRECTORY"})
-            .set(...require("./mock/auth"))
-            .expect(201);
-
-        await request(app)
-            .get("/directory/")
-            .set(...require("./mock/auth"))
-            .expect(200)
-            .then(res => {
-                expect(res.body).toHaveLength(1);
-                expect(res.body[0]._id).toBe("DIRECTORY");
+        describe("Directory addition", () => {
+            test("Should post item", async () => {
+                await request(app)
+                    .post("/directory/")
+                    .send({_id: "Some data"})
+                    .set(...require("./mock/auth"))
+                    .expect(201)
+                    .then(res => {
+                        expect(JSON.parse(res.text)._id).toBe("Some data");
+                    });
             });
+
+            test("Should post and get item", async () => {
+                await request(app)
+                    .post("/directory/")
+                    .send({_id: "DIRECTORY"})
+                    .set(...require("./mock/auth"))
+                    .expect(201);
+
+                await request(app)
+                    .get("/directory/")
+                    .set(...require("./mock/auth"))
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body).toHaveLength(1);
+                        expect(res.body[0]._id).toBe("DIRECTORY");
+                    });
+            });
+        });
+
+        describe("Directory deletion", () => {
+            test("Should delete", async () => {
+                await request(app)
+                    .post("/directory/")
+                    .send({_id: "COLOR"})
+                    .set(...require("./mock/auth"))
+                    .expect(201);
+
+                await request(app)
+                    .delete("/directory/COLOR/")
+                    .set(...require("./mock/auth"))
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body._id).toBe("COLOR");
+                    });
+            });
+        });
     });
 });

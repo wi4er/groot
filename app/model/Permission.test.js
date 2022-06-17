@@ -4,6 +4,13 @@ afterEach(() => require(".").clearDatabase());
 beforeAll(() => require(".").connect());
 afterAll(() => require(".").disconnect());
 
+jest.mock("../../environment", () => ({
+    DB_USER: "content",
+    DB_PASSWORD: "example",
+    DB_HOST: "localhost",
+    DB_NAME: "content",
+}));
+
 describe("Property entity", () => {
     describe("Property addition", () => {
         test("Should create group", async () => {
