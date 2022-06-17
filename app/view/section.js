@@ -11,11 +11,13 @@ router.get(
     permissionCheck([SECTION, PUBLIC], GET),
     (req, res, next) => {
         const {query: {filter, sort, limit, offset}} = req;
-        const parsedFilter = require("../query/sectionQuery").parseFilter(filter)
+        const parsedFilter = require("../query/sectionQuery").parseFilter(filter);
+        const parsedSort = require("../query/sectionQuery").parseSort(sort);
 
         Promise.all([
             Section.count(parsedFilter),
             Section.find(parsedFilter)
+                .sort(parsedSort)
                 .limit(+limit)
                 .skip(+offset),
         ])
@@ -52,6 +54,7 @@ router.post(
         new Section(req.body).save()
             .then(inst => {
                 res.status(201);
+                
                 res.json(inst);
             })
             .catch(next);

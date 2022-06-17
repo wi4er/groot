@@ -3,17 +3,6 @@ const Image = require("./Image");
 const Flag = require("./Flag");
 const DirectoryValue = require("./Value");
 
-const SectionImageSchema = new mongoose.Schema({
-    url: String,
-});
-
-const SectionDirectorySchema = new mongoose.Schema({
-    value: {
-        type: String,
-        ref: DirectoryValue,
-    },
-});
-
 const SectionSchema = new mongoose.Schema({
     slug: String,
     timestamp: Date,
@@ -31,13 +20,26 @@ const SectionSchema = new mongoose.Schema({
     },
     image: {
         type: Map,
-        of: [SectionImageSchema]
+        of: [{
+            url: String,
+        }]
     },
-    directory: [SectionDirectorySchema],
-    flag: [{
-        type: String,
-        ref: Flag,
-    }],
+    directory: {
+        type: [{
+            value: {
+                type: String,
+                ref: DirectoryValue,
+            },
+        }],
+        default: undefined,
+    },
+    flag: {
+        type: [{
+            type: String,
+            ref: Flag,
+        }],
+        default: undefined,
+    },
 });
 
 SectionSchema.pre("save", require("../cleaner/propertyCleaner"));

@@ -33,29 +33,21 @@ describe("Section", () => {
 
             const inst = await new Section({
                 slug: "DATA",
-                property: {
-                    "DEF": {
-                        "PROP": "VALUE",
-                    }
-                }
+                property: {"DEF": {"PROP": "VALUE"}}
             }).save();
 
             expect(inst.property.size).toBe(1);
             expect(inst.property.get("DEF").size).toBe(1);
-            expect(inst.property.get("DEF").get("PROP")).toEqual(["VALUE"]);
+            expect(inst.property.get("DEF").get("PROP")).toEqual("VALUE");
         });
 
         test("Should create with wrong property", async () => {
             const item = await new Section({
                 slug: "DATA",
-                property: {
-                    "DEF": {
-                        "LABEL": "VALUE_1",
-                    }
-                }
+                property: {"DEF": {"LABEL": "VALUE_1"}}
             }).save();
 
-            expect(item.property.size).toBe(0);
+            expect(item.property).toBeUndefined();
         });
 
         test("Should create with wrong lang", async () => {
@@ -63,14 +55,10 @@ describe("Section", () => {
 
             const item = await new Section({
                 slug: "DATA",
-                property: {
-                    "WRONG": {
-                        "PROP": "VALUE_1",
-                    }
-                }
+                property: {"WRONG": {"PROP": "VALUE_1"}}
             }).save();
 
-            expect(item.property.size).toBe(0);
+            expect(item.property).toBeUndefined();
         });
     });
 
@@ -119,24 +107,28 @@ describe("Section", () => {
 
             expect(inst.description.size).toBe(1);
             expect(inst.description.get("DEF").size).toBe(1);
-            expect(inst.description.get("DEF").get("DETAIL")).toEqual(["TEXT"]);
+            expect(inst.description.get("DEF").get("DETAIL")).toEqual("TEXT");
         });
 
         test("Should create section with wrong description", async () => {
             const item = await new Section({
                 slug: "DATA",
-                description: {
-                    "DEF": {
-                        "WRONG": "TEXT"
-                    }
-                },
+                description: {"DEF": {"WRONG": "TEXT"}},
             }).save();
 
-            expect(item.description.size).toBe(0);
+            expect(item.description).toBeUndefined();
         });
     });
 
     describe("Section with flag", () => {
+        test("Should create without flag", async () => {
+            await new Section({}).save();
+            const list = await Section.find({});
+            
+            expect(list).toHaveLength(1);
+            expect(list[0].flag).toBeUndefined();
+        });
+
         test("Should create with status", async () => {
             await new Flag({_id: "ACTIVE"}).save();
             const inst = await new Section({flag: ["ACTIVE"]}).save();

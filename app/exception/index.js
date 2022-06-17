@@ -1,5 +1,6 @@
 const WrongIdError = require("./WrongIdError");
 const PermissionError = require("./PermissionError");
+const WrongQueryArgument = require("./WrongQueryArgument");
 const WrongRefError = require("./WrongRefError");
 const {Error: {ValidationError}} = require("mongoose");
 const {MongoServerError} = require("mongodb")
@@ -47,6 +48,12 @@ module.exports = (err, req, res, next) => {
         }
 
         case MongoServerError: {
+            res.status(400);
+
+            break;
+        }
+
+        case WrongQueryArgument: {
             res.status(400);
 
             break;

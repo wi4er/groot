@@ -24,5 +24,9 @@ module.exports = async function(next) {
         }
     }
 
+    if (!this.description?.size) {
+        this.description = undefined;
+    }
+
     next();
 }
