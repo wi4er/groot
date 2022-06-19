@@ -9,11 +9,14 @@ const ContentSchema = new mongoose.Schema({
         type: Date,
         immutable: true,
     },
-    uniq: [{
-        uniq: String,
-        value: String,
-    }],
-    property: require("./PropertyItem"),
+    uniq: {
+        type: [{
+            uniq: String,
+            value: String,
+        }],
+        default: undefined,
+    },
+    property: require("./schema/PropertySchema"),
     description: {
         type: Map,
         of: {
@@ -34,14 +37,14 @@ const ContentSchema = new mongoose.Schema({
             ref: Value,
         }
     },
-    flag: [{
-        type: String,
-        ref: Flag,
-    }],
-    section: [{
-        type: String,
-        ref: Section,
-    }],
+    flag: require("./schema/FlagSchema"),
+    section: {
+        type: [{
+            type: String,
+            ref: Section,
+        }],
+        default: undefined,
+    },
     event: {
         type: Map,
         of: Date,
@@ -75,6 +78,4 @@ ContentSchema.index(
     }
 );
 
-const model = mongoose.model('content', ContentSchema);
-
-module.exports = model;
+module.exports =  mongoose.model('content', ContentSchema);

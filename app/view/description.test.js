@@ -75,6 +75,31 @@ describe("Description endpoint", function () {
                     });
             });
         });
+
+        describe("Description delete", () => {
+            test("Should delete item", async () => {
+                await request(app)
+                    .post("/description/")
+                    .send({_id: "PREVIEW"})
+                    .set(...require("./mock/auth"))
+                    .expect(201);
+
+                await request(app)
+                    .delete("/description/PREVIEW/")
+                    .set(...require("./mock/auth"))
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body._id).toBe("PREVIEW");
+                    });
+            });
+
+            test("Shouldn't delete nonexistant item", async () => {
+                await request(app)
+                    .delete("/description/PREVIEW/")
+                    .set(...require("./mock/auth"))
+                    .expect(404);
+            });
+        });
     });
 
     describe("Description with property", () => {
@@ -99,15 +124,15 @@ describe("Description endpoint", function () {
                 .expect(201)
                 .then(res => {
                     expect(Object.keys(res.body.property)).toHaveLength(1);
-                    expect(res.body.property["DEF"]["PROPERTY"]).toEqual(["VALUE"]);
+                    expect(res.body.property["DEF"]["PROPERTY"]).toEqual("VALUE");
                 });
         });
     });
 
-    describe("Description with status", () => {
-        test("Should post item with status", async () => {
+    describe("Description with flag", () => {
+        test("Should post item with flag", async () => {
             await request(app)
-                .post("/status/")
+                .post("/flag/")
                 .send({_id: "STATUS"})
                 .set(...require("./mock/auth"))
                 .expect(201);
@@ -116,14 +141,14 @@ describe("Description endpoint", function () {
                 .post("/description/")
                 .send({
                     _id: "WITH_STATUS",
-                    status: ["STATUS"],
+                    flag: ["STATUS"],
                 })
                 .set(...require("./mock/auth"))
                 .expect(201)
                 .then(res => {
                     expect(res.body._id).toBe("WITH_STATUS");
-                    expect(res.body.status).toHaveLength(1);
-                    expect(res.body.status[0]).toBe("STATUS");
+                    expect(res.body.flag).toHaveLength(1);
+                    expect(res.body.flag[0]).toBe("STATUS");
                 });
         });
     });

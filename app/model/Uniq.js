@@ -3,13 +3,15 @@ const mongoose = require("mongoose");
 const UniqSchema = new mongoose.Schema({
     _id: {
         type: String,
-        validate: v => v.length > 0,
+        validate: v => v?.length > 0,
     },
     timestamp: Date,
     created: {
         type: Date,
         immutable: true,
     },
+    flag: require("./schema/FlagSchema"),
+    property: require("./schema/PropertySchema"),
 });
 
 UniqSchema.pre("save", function(next) {

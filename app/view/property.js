@@ -11,10 +11,23 @@ router.get(
     "/",
     permissionCheck([PROPERTY, PUBLIC], GET),
     (req, res, next) => {
-        Property.find(
-            propertyQuery.parseFilter(req.query.filter)
-        )
-            .then(result => res.json(result))
+        const {query: {filter, sort, limit, offset}} = req;
+        const parsedFilter = propertyQuery.parseFilter(filter);
+        const parsedSort = propertyQuery.parseFilter(sort);
+
+        Promise.all([
+            Property.count(parsedFilter),
+            Property.find(parsedFilter)
+                .sort(parsedSort)
+                .limit(+limit)
+                .skip(+offset)
+        ])
+            .then(([count, result]) => {
+                res.header("total-row-count", count);
+                res.header("Access-Control-Expose-Headers", "total-row-count");
+
+                res.json(result);
+            })
             .catch(next);
     }
 );

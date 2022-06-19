@@ -1,5 +1,7 @@
-module.exports = list => (filter = []) => {
+
+module.exports = list => sort => {
     const result = {};
+
 
     return result;
 }

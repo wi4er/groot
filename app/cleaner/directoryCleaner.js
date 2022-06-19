@@ -1,4 +1,3 @@
-const Value = require("../model/Value");
 module.exports = async function (next) {
     const Directory = require("../model/Directory");
     const Value = require("../model/Value");
@@ -19,6 +18,10 @@ module.exports = async function (next) {
                 this.directory.delete(key);
             }
         }
+    }
+    
+    if (!this.directory?.size) {
+        this.directory = undefined;
     }
 
     next();

@@ -1,27 +1,23 @@
 const mongoose = require("mongoose");
-const Flag = require("./Flag");
 const Directory = require("./Directory");
 const WrongRefError = require("../exception/WrongRefError");
 
 const ValueSchema = new mongoose.Schema({
     _id: {
         type: String,
-        validate: v => v.length > 0,
+        validate: v => v?.length > 0,
     },
     timestamp: Date,
     created: {
         type: Date,
         immutable: true,
     },
-    flag: [{
-        type: String,
-        ref: Flag,
-    }],
     directory: {
         type: String,
         ref: Directory,
     },
-    property: require("./PropertyItem"),
+    flag: require("./schema/FlagSchema"),
+    property: require("./schema/PropertySchema"),
 });
 
 ValueSchema.pre("save", require("../cleaner/propertyCleaner"));

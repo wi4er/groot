@@ -91,7 +91,7 @@ describe("Section endpoint", function () {
     });
 
     describe("Section filter", () => {
-        describe("Section ifield filter", () => {
+        describe("Section field filter", () => {
             test("Section filter by id", async () => {
                 const list = [];
 
@@ -106,7 +106,7 @@ describe("Section endpoint", function () {
                 }
                 
                 await request(app)
-                    .get(`/section/?filter[][field][id][in]=${list[0]};${list[1]}`)
+                    .get(`/section/?filter[field][id][in]=${list[0]};${list[1]}`)
                     .set(...require("./mock/auth"))
                     .expect(200)
                     .then(res => {
@@ -130,7 +130,7 @@ describe("Section endpoint", function () {
                 }
 
                 await request(app)
-                    .get(`/section/?filter[][field][created][gt]=${list[2]}&filter[][field][created][lt]=${list[5]}`)
+                    .get(`/section/?filter[field][created][gt]=${list[2]}&filter[field][created][lt]=${list[5]}`)
                     .set(...require("./mock/auth"))
                     .expect(200)
                     .then(res => {
@@ -156,7 +156,7 @@ describe("Section endpoint", function () {
                 }
 
                 await request(app)
-                    .get(`/section/?filter[][field][timestamp][gt]=${list[3]}&filter[][field][timestamp][lt]=${list[5]}`)
+                    .get(`/section/?filter[field][timestamp][gt]=${list[3]}&filter[field][timestamp][lt]=${list[5]}`)
                     .set(...require("./mock/auth"))
                     .expect(200)
                     .then(res => {
@@ -169,28 +169,28 @@ describe("Section endpoint", function () {
 
             test("Shouldn't filter by wrong field", async () => {
                 await request(app)
-                    .get(`/section/?filter[][field][wrong][in]=WRONG`)
+                    .get(`/section/?filter[field][wrong][in]=WRONG`)
                     .set(...require("./mock/auth"))
                     .expect(400);
             });
 
             test("Shouldn't filter by wrong operation", async () => {
                 await request(app)
-                    .get(`/section/?filter[][field][id][wrong]=WRONG`)
+                    .get(`/section/?filter[field][id][wrong]=WRONG`)
                     .set(...require("./mock/auth"))
                     .expect(400);
             });
 
             test("Shouldn't filter without operation", async () => {
                 await request(app)
-                    .get(`/section/?filter[][field][id]=WRONG`)
+                    .get(`/section/?filter[field][id]=WRONG`)
                     .set(...require("./mock/auth"))
                     .expect(400);
             });
 
             test("Shouldn't filter without field name", async () => {
                 await request(app)
-                    .get(`/section/?filter[][field]=WRONG`)
+                    .get(`/section/?filter[field]=WRONG`)
                     .set(...require("./mock/auth"))
                     .expect(400);
             });
@@ -217,7 +217,7 @@ describe("Section endpoint", function () {
                 }
 
                 await request(app)
-                    .get(`/section/?filter[][property][PROP][in]=VALUE_3`)
+                    .get(`/section/?filter[property][PROP][in]=VALUE_3`)
                     .set(...require("./mock/auth"))
                     .expect(200)
                     .then(res => {
@@ -246,7 +246,7 @@ describe("Section endpoint", function () {
                 }
 
                 await request(app)
-                    .get(`/section/?filter[][property][WRONG][in]=WRONG`)
+                    .get(`/section/?filter[property][WRONG][in]=WRONG`)
                     .set(...require("./mock/auth"))
                     .expect(200)
                     .then(res => {
@@ -256,21 +256,21 @@ describe("Section endpoint", function () {
 
             test("Shouldn't filter with wrong operation", async () => {
                 await request(app)
-                    .get(`/section/?filter[][property][PROP][WRONG]=WRONG`)
+                    .get(`/section/?filter[property][PROP][WRONG]=WRONG`)
                     .set(...require("./mock/auth"))
                     .expect(400);
             });
 
             test("Shouldn't filter without operation", async () => {
                 await request(app)
-                    .get(`/section/?filter[][property][WRONG]=WRONG`)
+                    .get(`/section/?filter[property][WRONG]=WRONG`)
                     .set(...require("./mock/auth"))
                     .expect(400);
             });
 
             test("Shouldn't filter without property name", async () => {
                 await request(app)
-                    .get(`/section/?filter[][property]=WRONG`)
+                    .get(`/section/?filter[property]=WRONG`)
                     .set(...require("./mock/auth"))
                     .expect(400);
             });
@@ -295,7 +295,7 @@ describe("Section endpoint", function () {
                 }
 
                 await request(app)
-                    .get(`/section/?filter[][flag][in]=ACTIVE`)
+                    .get(`/section/?filter[flag][in]=ACTIVE`)
                     .set(...require("./mock/auth"))
                     .expect(200)
                     .then(res => {
@@ -330,7 +330,7 @@ describe("Section endpoint", function () {
                 }
 
                 await request(app)
-                    .get(`/section/?filter[][flag][in]=ENABLE;ACTIVE`)
+                    .get(`/section/?filter[flag][in]=ENABLE;ACTIVE`)
                     .set(...require("./mock/auth"))
                     .expect(200)
                     .then(res => {
@@ -365,7 +365,7 @@ describe("Section endpoint", function () {
                 }
 
                 await request(app)
-                    .get(`/section/?filter[][flag][in]=ENABLE&filter[][flag][in]=ACTIVE`)
+                    .get(`/section/?filter[flag][in]=ENABLE&filter[flag][in]=ACTIVE`)
                     .set(...require("./mock/auth"))
                     .expect(200)
                     .then(res => {
@@ -400,7 +400,7 @@ describe("Section endpoint", function () {
                 }
 
                 await request(app)
-                    .get(`/section/?filter[][flag][and]=ENABLE;ACTIVE`)
+                    .get(`/section/?filter[flag][and]=ENABLE;ACTIVE`)
                     .set(...require("./mock/auth"))
                     .expect(200)
                     .then(res => {
@@ -412,7 +412,46 @@ describe("Section endpoint", function () {
             });
         });
 
-        describe("Section flag and property filter", () => {
+        describe("Section value filter", () => {
+            test("Should filter by value", async () => {
+                await request(app)
+                    .post("/directory/")
+                    .set(...require("./mock/auth"))
+                    .send({_id: "COLOR"})
+                    .expect(201);
+
+                await request(app)
+                    .post("/value/")
+                    .set(...require("./mock/auth"))
+                    .send({
+                        _id: "BLUE",
+                        directory: "COLOR"
+                    })
+                    .expect(201);
+
+                for (let i = 0; i < 10; i++) {
+                    await request(app)
+                        .post("/section/")
+                        .set(...require("./mock/auth"))
+                        .send({
+                            directory: {
+                                COLOR: i % 2 ? "BLUE" : undefined,
+                            }
+                        })
+                        .expect(201);
+                }
+
+                await request(app)
+                    .get(`/section/`)
+                    .set(...require("./mock/auth"))
+                    .expect(200)
+                    .then(res => {
+                        console.dir(res.body, {depth: 6});
+                    });
+            });
+        });
+
+        describe("Section cross filter", () => {
             test("Should filer by flag and property", async () => {
                 await request(app)
                     .post("/flag/")
@@ -438,7 +477,7 @@ describe("Section endpoint", function () {
                 }
 
                 await request(app)
-                    .get(`/section/?filter[][property][ARTICLE][in]=VALUE&filter[][flag][in]=ACTIVE`)
+                    .get(`/section/?filter[property][ARTICLE][in]=VALUE&filter[flag][in]=ACTIVE`)
                     .set(...require("./mock/auth"))
                     .expect(200)
                     .then(res => {
@@ -446,5 +485,5 @@ describe("Section endpoint", function () {
                     });
             });
         })
-    })
+    });
 });

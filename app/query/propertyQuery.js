@@ -1,12 +1,20 @@
 const filterList = {
-    "field_id": (result, list) => {
-        result["_id"] = {$in: list};
+    "field": {
+        ...require("./filter/fieldFilter"),
     },
-    "status": (result, list) => {
-        result["status"] = {$in: list};
+    "property": {
+        ...require("./filter/propertyFilter"),
     },
-}
+    "flag": {
+        ...require("./filter/flagFilter"),
+    },
+};
+
+const sortList = {
+
+};
 
 module.exports = {
-    parseFilter: require("./queryParser")(filterList),
+    parseFilter: require("./filter")(filterList),
+    parseSort: require("./sort")(sortList),
 };

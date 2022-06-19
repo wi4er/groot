@@ -127,7 +127,7 @@ describe("Content endpoint", () => {
     describe("Content with flag", () => {
         test("Should post item with flag", async () => {
             await request(app)
-                .post("/status/")
+                .post("/flag/")
                 .send({_id: "ACTIVE"})
                 .set(...require("./mock/auth"))
                 .expect(201);
@@ -144,7 +144,7 @@ describe("Content endpoint", () => {
 
         test("Should post item with doubled flag", async () => {
             await request(app)
-                .post("/status/")
+                .post("/flag/")
                 .send({_id: "ACTIVE"})
                 .set(...require("./mock/auth"))
                 .expect(201);
@@ -161,7 +161,7 @@ describe("Content endpoint", () => {
 
         test("Shouldn't post item with wrong flag", async () => {
             await request(app)
-                .post("/status/")
+                .post("/flag/")
                 .send({_id: "ACTIVE"})
                 .set(...require("./mock/auth"))
                 .expect(201)
@@ -189,9 +189,7 @@ describe("Content endpoint", () => {
                 .post("/content/")
                 .send({
                     property: {
-                        "DEF": {
-                            "NAME": "VALUE"
-                        }
+                        "DEF": {"NAME": "VALUE"}
                     }
                 })
                 .set(...require("./mock/auth"))
@@ -199,6 +197,33 @@ describe("Content endpoint", () => {
                 .then(result => {
                     expect(Object.keys(result.body.property)).toHaveLength(1);
                     expect(result.body.property["DEF"]["NAME"]).toEqual("VALUE");
+                });
+        });
+
+        test("Should post item with lang and property", async () => {
+            await request(app)
+                .post("/property/")
+                .send({_id: "NAME"})
+                .set(...require("./mock/auth"))
+                .expect(201);
+
+            await request(app)
+                .post("/lang/")
+                .send({_id: "EN"})
+                .set(...require("./mock/auth"))
+                .expect(201);
+
+            await request(app)
+                .post("/content/")
+                .send({
+                    property: {
+                        "EN": {"NAME": "VALUE"}
+                    }
+                })
+                .set(...require("./mock/auth"))
+                .expect(201)
+                .then(result => {
+                    expect(result.body.property["EN"]["NAME"]).toEqual("VALUE");
                 });
         });
 
@@ -213,15 +238,13 @@ describe("Content endpoint", () => {
                 .post("/content/")
                 .send({
                     property: {
-                        "DEF": {
-                            "ARTICLE": "VALUE"
-                        }
+                        "DEF": {"ARTICLE": "VALUE"}
                     }
                 })
                 .set(...require("./mock/auth"))
                 .expect(201)
                 .then(res => {
-                    expect(Object.keys(res.body.property)).toHaveLength(0);
+                    expect(res.body.property).toBeUndefined();
                 });
         });
     });

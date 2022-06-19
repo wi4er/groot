@@ -43,7 +43,7 @@ describe("Property entity", function () {
             }).save();
 
             expect(inst._id).toBe("OUTER");
-            expect(inst.property.get("DEF").get("INNER")).toEqual(["VALUE"]);
+            expect(inst.property.get("DEF").get("INNER")).toEqual("VALUE");
         });
 
         test("Should create with wrong property", async () => {
@@ -56,7 +56,7 @@ describe("Property entity", function () {
                 }
             }).save();
 
-            expect(inst.property.size).toBe(0);
+            expect(inst.property).toBeUndefined();
         });
 
         test("Should create with wrong and correct properties", async () => {

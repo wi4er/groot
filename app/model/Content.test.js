@@ -202,13 +202,11 @@ describe("Content entity", () => {
         test("Should create with wrong property", async () => {
             const inst = await new Content({
                 property: {
-                    "DEF": {
-                        "LABEL": "VALUE_1"
-                    }
+                    "DEF": {"LABEL": "VALUE_1"}
                 }
             }).save();
 
-            expect(inst.property.size).toBe(0);
+            expect(inst.property).toBeUndefined();
         });
 
         test("Should create with wrong and correct property", async () => {
@@ -251,13 +249,11 @@ describe("Content entity", () => {
 
             const inst = await new Content({
                 property: {
-                    "WRONG": {
-                        "PROP": "VALUE",
-                    }
+                    "WRONG": {"PROP": "VALUE"}
                 }
             }).save();
 
-            expect(inst.property.size).toBe(0);
+            expect(inst.property).toBeUndefined();
         });
 
         test("Should create with wrong and correct lang", async () => {
@@ -290,7 +286,7 @@ describe("Content entity", () => {
                 }
             }).save();
 
-            expect(inst.property.size).toBe(0);
+            expect(inst.property).toBeUndefined();
         });
 
         test("Should create with nullable value", async () => {
@@ -303,7 +299,7 @@ describe("Content entity", () => {
                 }
             }).save();
 
-            expect(inst.property.size).toBe(0);
+            expect(inst.property).toBeUndefined();
         });
 
 
@@ -316,7 +312,7 @@ describe("Content entity", () => {
                 }
             }).save();
 
-            expect(inst.property.size).toBe(0);
+            expect(inst.property).toBeUndefined();
         });
     });
 
@@ -357,9 +353,7 @@ describe("Content entity", () => {
             const inst = await new Content({
                 slug: "DATA",
                 description: {
-                    "DEF": {
-                        "DETAIL": "TEXT"
-                    }
+                    "DEF": {"DETAIL": "TEXT"}
                 },
             }).save();
 
@@ -372,13 +366,11 @@ describe("Content entity", () => {
             const inst = await new Content({
                 slug: "DATA",
                 description: {
-                    "DEF": {
-                        "DETAIL": "TEXT"
-                    }
+                    "DEF": {"DETAIL": "TEXT"}
                 },
             }).save();
 
-            expect(inst.description.size).toBe(0);
+            expect(inst.description).toBeUndefined();
         });
 
         test("Should create content with lang", async () => {
@@ -388,9 +380,7 @@ describe("Content entity", () => {
             const inst = await new Content({
                 slug: "DATA",
                 description: {
-                    "EN": {
-                        "DETAIL": "TEXT"
-                    }
+                    "EN": {"DETAIL": "TEXT"}
                 },
             }).save();
 
@@ -405,13 +395,11 @@ describe("Content entity", () => {
             const inst = await new Content({
                 slug: "DATA",
                 description: {
-                    "WRONG": {
-                        "DETAIL": "TEXT"
-                    }
+                    "WRONG": {"DETAIL": "TEXT"}
                 },
             }).save();
 
-            expect(inst.description.size).toBe(0);
+            expect(inst.description).toBeUndefined();
         });
     });
 
@@ -455,7 +443,7 @@ describe("Content entity", () => {
                 }
             }).save();
 
-            expect(inst.directory.size).toBe(0);
+            expect(inst.directory).toBeUndefined();
         });
 
         test("Should create with wrong and correct directory", async () => {
@@ -513,7 +501,7 @@ describe("Content entity", () => {
                 }
             }).save();
 
-            expect(inst.directory.size).toBe(0);
+            expect(inst.directory).toBeUndefined();
         });
     });
 

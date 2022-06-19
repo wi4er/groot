@@ -4,18 +4,15 @@ const Flag = require("./Flag");
 const DescriptionSchema = new mongoose.Schema({
     _id: {
         type: String,
-        validate: v => v.length > 0,
+        validate: v => v?.length > 0,
     },
     timestamp: Date,
     created: {
         type: Date,
         immutable: true,
     },
-    flag: [{
-        type: String,
-        ref: Flag,
-    }],
-    property: require("./PropertyItem"),
+    flag: require("./schema/FlagSchema"),
+    property: require("./schema/PropertySchema"),
 });
 
 DescriptionSchema.pre("save", require("../cleaner/propertyCleaner"));

@@ -3,13 +3,15 @@ const mongoose = require("mongoose");
 const StatusSchema = new mongoose.Schema({
     _id: {
         type: String,
-        validate: v => v.length > 0,
+        validate: v => v?.length > 0,
     },
     timestamp: Date,
     created: {
         type: Date,
         immutable: true,
     },
+    // flag: require("./schema/FlagSchema"),
+    property: require("./schema/PropertySchema"),
 });
 
 StatusSchema.pre("save", function(next) {

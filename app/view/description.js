@@ -11,10 +11,23 @@ router.get(
     "/",
     permissionCheck([DESCRIPTION, PUBLIC], GET),
     (req, res, next) => {
-        Description.find(
-            descriptionQuery.parseFilter(req.query.filter)
-        )
-            .then(result => res.send(result))
+        const {query: {filter, sort, limit, offset}} = req;
+        const parsedFilter = descriptionQuery.parseFilter(filter);
+        const parsedSort = descriptionQuery.parseFilter(sort);
+
+        Promise.all([
+            Description.count(parsedFilter),
+            Description.find(parsedFilter)
+                .sort(parsedSort)
+                .limit(+limit)
+                .skip(+offset),
+        ])
+            .then(([count, result]) => {
+                res.header("total-row-count", count);
+                res.header("Access-Control-Expose-Headers", "total-row-count");
+
+                res.json(result);
+            })
             .catch(next);
     }
 );
@@ -29,7 +42,7 @@ router.get(
             .then(result => {
                 WrongIdError.assert(result, `Cant find property with id ${id}!`);
 
-                res.send(result);
+                res.json(result);
             })
             .catch(next);
     }
@@ -42,7 +55,7 @@ router.post(
         new Description(req.body).save()
             .then(result => {
                 res.status(201);
-                res.send(result);
+                res.json(result);
             })
             .catch(next);
     }
@@ -62,7 +75,7 @@ router.put(
 
                 return Object.assign(result, req.body).save();
             })
-            .then(saved => res.send(saved))
+            .then(saved => res.json(saved))
             .catch(next);
     }
 );
@@ -74,12 +87,12 @@ router.delete(
         const {params: {id}} = req;
 
         Description.findById(id)
-            .then(result => {
-                WrongIdError.assert(result, `Cant delete description with id ${id}!`);
+            .then(async description => {
+                WrongIdError.assert(description, `Cant delete description with id ${id}!`);
+                WrongIdError.assert(await description.delete(), `Cant delete description with id ${id}!`);
 
-                return result.delete();
+                res.json(description);
             })
-            .then(() => res.send(true))
             .catch(next);
     }
 );
