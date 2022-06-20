@@ -1,5 +1,8 @@
 module.exports = {
     "in": (result, list) => {
+        console.log(list);
+        
+        
         result[`flag`] = {$in: list};
     },
     "and": (result, list) => {

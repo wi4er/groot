@@ -14,10 +14,13 @@ module.exports = list => (filter = []) => {
     if (!Array.isArray(filter)) {
         filter = [filter];
     }
-
+    
     for (const item of filter) {
         for (const key in item) {
             for (const field in item[key]) {
+                console.log(key);
+                
+                
                 if (typeof list[key][field] === "function") {
                     list[key][field](result, formatArguments(item[key][field]));
 

@@ -151,5 +151,27 @@ describe("Description endpoint", function () {
                     expect(res.body.flag[0]).toBe("STATUS");
                 });
         });
+
+        test("Should post item with same flag", async () => {
+            await request(app)
+                .post("/flag/")
+                .send({_id: "STATUS"})
+                .set(...require("./mock/auth"))
+                .expect(201);
+
+            await request(app)
+                .post("/description/")
+                .send({
+                    _id: "WITH_STATUS",
+                    flag: ["STATUS", "STATUS", "STATUS"],
+                })
+                .set(...require("./mock/auth"))
+                .expect(201)
+                .then(res => {
+                    expect(res.body._id).toBe("WITH_STATUS");
+                    expect(res.body.flag).toHaveLength(1);
+                    expect(res.body.flag[0]).toBe("STATUS");
+                });
+        });
     });
 });

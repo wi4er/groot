@@ -1,86 +1,50 @@
 const {Router} = require("express");
 const router = Router();
 const Permission = require("../model/Permission");
-const WrongIdError = require("../exception/WrongIdError");
 const {PERMISSION} = require("../permission/entity");
 const {GET, POST, PUT, DELETE} = require("../permission/method");
 const permissionCheck = require("../permission/check");
+const {createGet, createGetById, createPost, createPut, createDelete} = require("./factory/routeFactory");
+
+const permissionQuery = {
+    parseFilter: require("./filter")( {
+        "field": {
+            ...require("./filter/fieldFilter"),
+        },
+    }),
+    parseSort: require("./sort")({
+
+    }),
+};
 
 router.get(
     "/",
     permissionCheck([PERMISSION], GET),
-    (req, res, next) => {
-        Permission.find(
-            // require("../query/permissionFilter").parseFilter(req.query.filter)
-        )
-            .then(result => res.send(result))
-            .catch(next);
-    }
+    createGet(Permission, {}),
 );
 
 router.get(
     "/:id/",
     permissionCheck([PERMISSION], GET),
-    (req, res, next) => {
-        const {params: {id}} = req;
-
-        Permission.findById(id)
-            .then(result => {
-                WrongIdError.assert(result, `Cant find permission with id ${id}!`);
-
-                res.send(result);
-            })
-            .catch(next);
-    }
+    createGetById(Permission),
 );
 
 router.post(
     "/",
     permissionCheck([PERMISSION], POST),
-    (req, res, next) => {
-        new Permission(req.body).save()
-            .then(result => {
-                res.status(201);
-                res.send(result);
-            })
-            .catch(next);
-    }
+    createPost(Permission),
 );
 
 router.put(
     "/:id/",
     permissionCheck([PERMISSION], PUT),
-    (req, res, next) => {
-        const {params: {id}} = req;
-
-        WrongIdError.assert(id === req.body._id, "Wrong id in body request");
-
-        Permission.findById(id)
-            .then(result => {
-                WrongIdError.assert(result, `Cant update permission with id ${id}!`);
-
-                return Object.assign(result, req.body).save();
-            })
-            .then(saved => res.send(saved))
-            .catch(next);
-    }
+    createPut(Permission),
 );
 
 router.delete(
     "/:id/",
     permissionCheck([PERMISSION], DELETE),
-    (req, res, next) => {
-        const {params: {id}} = req;
-
-        Permission.findById(id)
-            .then(result => {
-                WrongIdError.assert(result, `Cant delete permission with id ${id}!`);
-
-                return result.delete();
-            })
-            .then(() => res.send(true))
-            .catch(next);
-    }
+    createDelete(Permission),
 );
 
 module.exports = router;

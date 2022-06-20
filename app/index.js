@@ -21,6 +21,7 @@ try {
     app.use("/image/", require("./view/image"));
     app.use("/event/", require("./view/event"));
     app.use("/uniq/", require("./view/uniq"));
+    app.use("/lang/", require("./view/lang"));
 
     app.use(require("./exception"));
 

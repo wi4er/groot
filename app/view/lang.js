@@ -1,13 +1,13 @@
 const {Router} = require("express");
 const router = Router();
-const Value = require("../model/Value");
-const {VALUE, PUBLIC} = require("../permission/entity");
+const Lang = require("../model/Lang");
+const {LANG} = require("../permission/entity");
 const {GET, POST, PUT, DELETE} = require("../permission/method");
 const permissionCheck = require("../permission/check");
 const {createGet, createGetById, createPost, createPut, createDelete} = require("./factory/routeFactory");
 
-const valueQuery =  {
-    parseFilter: require("./filter")( {
+const langQuery =  {
+    parseFilter: require("./filter")({
         "field": {
             ...require("./filter/fieldFilter"),
         },
@@ -25,32 +25,32 @@ const valueQuery =  {
 
 router.get(
     "/",
-    permissionCheck([VALUE, PUBLIC], GET),
-    createGet(Value, valueQuery),
+    permissionCheck([LANG], GET),
+    createGet(Lang, langQuery),
 );
 
 router.get(
     "/:id/",
-    permissionCheck([VALUE, PUBLIC], GET),
-    createGetById(Value),
+    permissionCheck([LANG], GET),
+    createGetById(Lang),
 );
 
 router.post(
     "/",
-    permissionCheck([VALUE, PUBLIC], POST),
-    createPost(Value),
+    permissionCheck([LANG], POST),
+    createPost(Lang),
 );
 
 router.put(
     "/:id/",
-    permissionCheck([VALUE, PUBLIC], PUT),
-    createPut(Value),
+    permissionCheck([LANG], PUT),
+    createPut(Lang),
 );
 
 router.delete(
     "/:id/",
-    permissionCheck([VALUE, PUBLIC], DELETE),
-    createDelete(Value),
+    permissionCheck([LANG], DELETE),
+    createDelete(Lang),
 );
 
 module.exports = router;

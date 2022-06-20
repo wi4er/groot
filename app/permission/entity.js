@@ -11,4 +11,5 @@ module.exports = {
     STATUS: "STATUS",
     PUBLIC: "PUBLIC",
     UNIQ: "UNIQ",
+    EVENT: "EVENT",
 };
