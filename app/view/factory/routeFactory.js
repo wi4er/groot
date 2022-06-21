@@ -1,4 +1,3 @@
-const Property = require("../../model/Property");
 const WrongIdError = require("../../exception/WrongIdError");
 
 function createGet(Model, query) {
@@ -6,7 +5,7 @@ function createGet(Model, query) {
         const {query: {filter, sort, limit, offset}} = req;
         
         const parsedFilter = query.parseFilter(filter);
-        const parsedSort = query.parseFilter(sort);
+        const parsedSort = query.parseSort(sort);
 
         Promise.all([
             Model.count(parsedFilter),

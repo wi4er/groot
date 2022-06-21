@@ -15,8 +15,8 @@ const DirectorySchema = new mongoose.Schema({
     property: require("./schema/PropertySchema"),
 });
 
-DirectorySchema.pre("save", require("../cleaner/propertyCleaner"));
-DirectorySchema.pre("save", require("../cleaner/flagCleaner"));
+DirectorySchema.pre("save", require("./cleaner/propertyCleaner"));
+DirectorySchema.pre("save", require("./cleaner/flagCleaner"));
 DirectorySchema.pre("save", function(next) {
     this.timestamp = new Date();
 

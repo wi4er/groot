@@ -1,5 +1,5 @@
 module.exports = async function(next) {
-    const Section = require("../model/Section");
+    const Section = require("../Section");
     const set = new Set(this.section);
 
     for (const key of set) {

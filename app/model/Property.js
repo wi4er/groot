@@ -14,8 +14,8 @@ const PropertySchema = new mongoose.Schema({
     property: require("./schema/PropertySchema"),
 });
 
-PropertySchema.pre("save", require("../cleaner/propertyCleaner"));
-PropertySchema.pre("save", require("../cleaner/flagCleaner"));
+PropertySchema.pre("save", require("./cleaner/propertyCleaner"));
+PropertySchema.pre("save", require("./cleaner/flagCleaner"));
 PropertySchema.pre("save", function (next) {
     this.timestamp = new Date();
 

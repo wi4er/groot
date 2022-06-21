@@ -9,13 +9,7 @@ const ContentSchema = new mongoose.Schema({
         type: Date,
         immutable: true,
     },
-    uniq: {
-        type: [{
-            uniq: String,
-            value: String,
-        }],
-        default: undefined,
-    },
+    uniq: require("./schema/UniqSchema"),
     property: require("./schema/PropertySchema"),
     description: {
         type: Map,
@@ -51,14 +45,14 @@ const ContentSchema = new mongoose.Schema({
     },
 });
 
-ContentSchema.pre("save", require("../cleaner/propertyCleaner"));
-ContentSchema.pre("save", require("../cleaner/descriptionCleaner"));
-ContentSchema.pre("save", require("../cleaner/flagCleaner"));
-ContentSchema.pre("save", require("../cleaner/sectionCleaner"));
-ContentSchema.pre("save", require("../cleaner/imageCleaner"));
-ContentSchema.pre("save", require("../cleaner/directoryCleaner"));
-ContentSchema.pre("save", require("../cleaner/eventCleaner"));
-ContentSchema.pre("save", require("../cleaner/uniqCleaner"));
+ContentSchema.pre("save", require("./cleaner/propertyCleaner"));
+ContentSchema.pre("save", require("./cleaner/descriptionCleaner"));
+ContentSchema.pre("save", require("./cleaner/flagCleaner"));
+ContentSchema.pre("save", require("./cleaner/sectionCleaner"));
+ContentSchema.pre("save", require("./cleaner/imageCleaner"));
+ContentSchema.pre("save", require("./cleaner/directoryCleaner"));
+ContentSchema.pre("save", require("./cleaner/eventCleaner"));
+ContentSchema.pre("save", require("./cleaner/uniqCleaner"));
 
 ContentSchema.pre("save", function (next) {
     this.timestamp = new Date();

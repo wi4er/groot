@@ -15,8 +15,8 @@ const DescriptionSchema = new mongoose.Schema({
     property: require("./schema/PropertySchema"),
 });
 
-DescriptionSchema.pre("save", require("../cleaner/propertyCleaner"));
-DescriptionSchema.pre("save", require("../cleaner/flagCleaner"));
+DescriptionSchema.pre("save", require("./cleaner/propertyCleaner"));
+DescriptionSchema.pre("save", require("./cleaner/flagCleaner"));
 DescriptionSchema.pre("save", function (next) {
     this.timestamp = new Date();
 

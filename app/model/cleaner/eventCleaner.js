@@ -1,5 +1,5 @@
 module.exports = async function(next) {
-    const Event = require("../model/Event");
+    const Event = require("../Event");
 
     if (this.event) {
         for (const key of this.event.keys()) {

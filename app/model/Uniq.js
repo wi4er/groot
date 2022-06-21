@@ -14,6 +14,8 @@ const UniqSchema = new mongoose.Schema({
     property: require("./schema/PropertySchema"),
 });
 
+UniqSchema.pre("save", require("./cleaner/propertyCleaner"));
+UniqSchema.pre("save", require("./cleaner/flagCleaner"));
 UniqSchema.pre("save", function(next) {
     this.timestamp = new Date();
 

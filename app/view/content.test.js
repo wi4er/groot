@@ -608,7 +608,7 @@ describe("Content endpoint", () => {
     describe("Content sorting", () => {
         test("Should get with status sort", async () => {
             await request(app)
-                .post("/status/")
+                .post("/flag/")
                 .send({_id: "STATUS"})
                 .set(...require("./mock/auth"))
                 .expect(201);
@@ -617,14 +617,14 @@ describe("Content endpoint", () => {
                 await request(app)
                     .post("/content/")
                     .send({
-                        status: [i % 2 === 0 ? "STATUS" : undefined],
+                        flag: [i % 2 === 0 ? "STATUS" : undefined],
                     })
                     .set(...require("./mock/auth"))
                     .expect(201);
             }
 
             await request(app)
-                .get("/content/?sort=status-STATUS-asc")
+                .get("/content/?sort[flag][STATUS]=asc")
                 .set(...require("./mock/auth"))
                 .expect(200)
                 .then(res => {

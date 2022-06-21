@@ -1,6 +1,6 @@
 module.exports = async function (next) {
-    const Property = require("../model/Property");
-    const Lang = require("../model/Lang");
+    const Property = require("../Property");
+    const Lang = require("../Lang");
 
     for (const langKey of this.property?.keys() || []) {
         if (!this.property.get(langKey)) {

@@ -18,9 +18,6 @@ module.exports = list => (filter = []) => {
     for (const item of filter) {
         for (const key in item) {
             for (const field in item[key]) {
-                console.log(key);
-                
-                
                 if (typeof list[key][field] === "function") {
                     list[key][field](result, formatArguments(item[key][field]));
 

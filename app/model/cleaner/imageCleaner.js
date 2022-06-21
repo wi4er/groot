@@ -1,4 +1,4 @@
-const Image = require("../model/Image");
+const Image = require("../Image");
 
 module.exports = async function(next) {
     for (const key of this.image?.keys() ?? []) {

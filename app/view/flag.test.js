@@ -117,9 +117,6 @@ describe("Flag endpoint", function () {
                 .then(res => {
                     expect(JSON.parse(res.text).length).toBe(3);
                 })
-                .catch(err => {
-                    console.log(err);
-                });
         });
     });
 });

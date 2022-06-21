@@ -1,6 +1,6 @@
 module.exports = async function (next) {
-    const Directory = require("../model/Directory");
-    const Value = require("../model/Value");
+    const Directory = require("../Directory");
+    const Value = require("../Value");
 
     for (const key of this.directory?.keys() ?? []) {
         if (!await Directory.findById(key)) {

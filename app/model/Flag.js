@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const StatusSchema = new mongoose.Schema({
+const FlagSchema = new mongoose.Schema({
     _id: {
         type: String,
         validate: v => v?.length > 0,
@@ -14,7 +14,9 @@ const StatusSchema = new mongoose.Schema({
     property: require("./schema/PropertySchema"),
 });
 
-StatusSchema.pre("save", function(next) {
+FlagSchema.pre("save", require("./cleaner/propertyCleaner"));
+FlagSchema.pre("save", require("./cleaner/flagCleaner"));
+FlagSchema.pre("save", function(next) {
     this.timestamp = new Date();
 
     if (this.isNew) {
@@ -24,4 +26,4 @@ StatusSchema.pre("save", function(next) {
     next();
 });
 
-module.exports = mongoose.model("status", StatusSchema);
+module.exports = mongoose.model("flag", FlagSchema);

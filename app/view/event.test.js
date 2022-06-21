@@ -31,10 +31,6 @@ describe("Event endpoint", () => {
                 .send({_id: "MODIFY"})
                 .expect(201)
                 .then(response => {
-
-                    console.log(response.body);
-
-
                     expect(response.body._id).toBe("MODIFY");
                 });
         });

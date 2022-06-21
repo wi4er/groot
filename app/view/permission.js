@@ -20,7 +20,7 @@ const permissionQuery = {
 router.get(
     "/",
     permissionCheck([PERMISSION], GET),
-    createGet(Permission, {}),
+    createGet(Permission, permissionQuery),
 );
 
 router.get(

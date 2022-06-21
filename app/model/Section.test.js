@@ -18,12 +18,11 @@ jest.mock("../../environment", () => ({
 describe("Section", () => {
     describe("Section fields", function () {
         test("Should create", async () => {
-            const inst = await new Section({
-                slug: "DATA",
-            }).save();
+            const inst = await new Section({}).save();
 
-            expect(inst.slug).toBe("DATA");
+            expect(inst._id.toString().length).toBe(24);
             expect(inst.timestamp).not.toBeUndefined();
+            expect(inst.created).not.toBeUndefined();
         });
     });
 
@@ -32,7 +31,6 @@ describe("Section", () => {
             await new Property({_id: "PROP"}).save();
 
             const inst = await new Section({
-                slug: "DATA",
                 property: {"DEF": {"PROP": "VALUE"}}
             }).save();
 
@@ -43,7 +41,6 @@ describe("Section", () => {
 
         test("Should create with wrong property", async () => {
             const item = await new Section({
-                slug: "DATA",
                 property: {"DEF": {"LABEL": "VALUE_1"}}
             }).save();
 
@@ -54,7 +51,6 @@ describe("Section", () => {
             await new Property({_id: "PROP"}).save();
 
             const item = await new Section({
-                slug: "DATA",
                 property: {"WRONG": {"PROP": "VALUE_1"}}
             }).save();
 
@@ -66,7 +62,6 @@ describe("Section", () => {
         test("Should create section with image", async () => {
             await new Image({_id: "PREVIEW"}).save();
             const inst = await new Section({
-                slug: "DATA",
                 image: {
                     "PREVIEW": {
                         url: "http://localhost/image.jpg",
@@ -80,7 +75,6 @@ describe("Section", () => {
 
         test("Should create section with wrong image", async () => {
             const inst = await new Section({
-                slug: "DATA",
                 image: {
                     "WRONG": {
                         url: "http://localhost/image.jpg",
@@ -95,14 +89,8 @@ describe("Section", () => {
     describe("Section with description", () => {
         test("Should create with description", async () => {
             await new Description({_id: "DETAIL"}).save()
-
             const inst = await new Section({
-                slug: "DATA",
-                description: {
-                    "DEF": {
-                        "DETAIL": "TEXT"
-                    }
-                },
+                description: {"DEF": {"DETAIL": "TEXT"}},
             }).save();
 
             expect(inst.description.size).toBe(1);
@@ -112,7 +100,6 @@ describe("Section", () => {
 
         test("Should create section with wrong description", async () => {
             const item = await new Section({
-                slug: "DATA",
                 description: {"DEF": {"WRONG": "TEXT"}},
             }).save();
 
@@ -138,7 +125,6 @@ describe("Section", () => {
 
         test("Shouldn't create section with wrong status", async () => {
             const item = await new Section({
-                slug: "DATA",
                 flag: ["WRONG"],
             }).save();
 

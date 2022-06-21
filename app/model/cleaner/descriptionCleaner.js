@@ -1,7 +1,7 @@
 
 module.exports = async function(next) {
-    const Description = require("../model/Description");
-    const Lang = require("../model/Lang");
+    const Description = require("../Description");
+    const Lang = require("../Lang");
 
     for (const key of this.description?.keys() ?? []) {
         if (!this.description.get(key)) {

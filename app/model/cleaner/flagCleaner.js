@@ -1,5 +1,5 @@
 module.exports = async function(next) {
-    const Flag = require("../model/Flag");
+    const Flag = require("../Flag");
     const set = new Set(this.flag);
 
     for (const key of set) {

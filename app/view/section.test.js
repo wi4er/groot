@@ -446,7 +446,7 @@ describe("Section endpoint", function () {
                     .set(...require("./mock/auth"))
                     .expect(200)
                     .then(res => {
-                        console.dir(res.body, {depth: 6});
+
                     });
             });
         });
