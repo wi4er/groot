@@ -1,10 +1,11 @@
 const jwt = require("jsonwebtoken");
+const env = require("../environment");
 
-module.exports = [
+module.exports = () => ([
     "authorization",
     `Bearer ${jwt.sign(
         {id: 1, admin: true},
-        "hello world !",
+        env.SECRET,
         { algorithm: 'HS256'}
     )}`
-];
+]);

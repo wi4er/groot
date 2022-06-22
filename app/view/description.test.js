@@ -18,7 +18,7 @@ describe("Description endpoint", function () {
             test("Should get list", async () => {
                 await request(app)
                     .get("/description/")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(200)
                     .then(response => {
                         expect(response.body.length).toBe(0);
@@ -29,7 +29,7 @@ describe("Description endpoint", function () {
                 await request(app)
                     .post("/description/")
                     .send({_id: "Some data"})
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(201)
                     .then(res => {
                         expect(res.body._id).toBe("Some data");
@@ -40,13 +40,13 @@ describe("Description endpoint", function () {
                 await request(app)
                     .post("/description/")
                     .send({_id: "UNIQ"})
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(201);
 
                 await request(app)
                     .post("/description/")
                     .send({_id: "UNIQ"})
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(400);
             });
 
@@ -54,7 +54,7 @@ describe("Description endpoint", function () {
                 await request(app)
                     .post("/description/")
                     .send({_id: ""})
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(400);
             });
 
@@ -62,12 +62,12 @@ describe("Description endpoint", function () {
                 await request(app)
                     .post("/description/")
                     .send({_id: "Some data"})
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(201)
 
                 await request(app)
                     .get("/description/")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(200)
                     .then(response => {
                         expect(response.body.length).toBe(1);
@@ -81,12 +81,12 @@ describe("Description endpoint", function () {
                 await request(app)
                     .post("/description/")
                     .send({_id: "PREVIEW"})
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(201);
 
                 await request(app)
                     .delete("/description/PREVIEW/")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(200)
                     .then(res => {
                         expect(res.body._id).toBe("PREVIEW");
@@ -96,7 +96,7 @@ describe("Description endpoint", function () {
             test("Shouldn't delete nonexistant item", async () => {
                 await request(app)
                     .delete("/description/PREVIEW/")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(404);
             });
         });
@@ -107,7 +107,7 @@ describe("Description endpoint", function () {
             await request(app)
                 .post("/property/")
                 .send({_id: "PROPERTY"})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201);
 
             await request(app)
@@ -120,7 +120,7 @@ describe("Description endpoint", function () {
                         }
                     }
                 })
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201)
                 .then(res => {
                     expect(Object.keys(res.body.property)).toHaveLength(1);
@@ -134,7 +134,7 @@ describe("Description endpoint", function () {
             await request(app)
                 .post("/flag/")
                 .send({_id: "STATUS"})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201);
 
             await request(app)
@@ -143,7 +143,7 @@ describe("Description endpoint", function () {
                     _id: "WITH_STATUS",
                     flag: ["STATUS"],
                 })
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201)
                 .then(res => {
                     expect(res.body._id).toBe("WITH_STATUS");
@@ -156,7 +156,7 @@ describe("Description endpoint", function () {
             await request(app)
                 .post("/flag/")
                 .send({_id: "STATUS"})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201);
 
             await request(app)
@@ -165,7 +165,7 @@ describe("Description endpoint", function () {
                     _id: "WITH_STATUS",
                     flag: ["STATUS", "STATUS", "STATUS"],
                 })
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201)
                 .then(res => {
                     expect(res.body._id).toBe("WITH_STATUS");

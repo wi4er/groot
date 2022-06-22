@@ -17,7 +17,7 @@ describe("Directory endpoint", function () {
         test("Should get list", async () => {
             await request(app)
                 .get("/directory/")
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(200);
         });
 
@@ -26,7 +26,7 @@ describe("Directory endpoint", function () {
                 await request(app)
                     .post("/directory/")
                     .send({_id: "Some data"})
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(201)
                     .then(res => {
                         expect(JSON.parse(res.text)._id).toBe("Some data");
@@ -37,12 +37,12 @@ describe("Directory endpoint", function () {
                 await request(app)
                     .post("/directory/")
                     .send({_id: "DIRECTORY"})
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(201);
 
                 await request(app)
                     .get("/directory/")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(200)
                     .then(res => {
                         expect(res.body).toHaveLength(1);
@@ -56,12 +56,12 @@ describe("Directory endpoint", function () {
                 await request(app)
                     .post("/directory/")
                     .send({_id: "COLOR"})
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(201);
 
                 await request(app)
                     .delete("/directory/COLOR/")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(200)
                     .then(res => {
                         expect(res.body._id).toBe("COLOR");

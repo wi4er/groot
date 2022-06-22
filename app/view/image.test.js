@@ -19,7 +19,7 @@ describe("Image endpoint", function () {
                 await request(app)
                     .get("/image/")
                     .expect(200)
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .then(res => {
                         expect(JSON.parse(res.text)).toEqual([]);
                     });
@@ -31,7 +31,7 @@ describe("Image endpoint", function () {
                 await request(app)
                     .post("/image/")
                     .send({_id: "PREVIEW"})
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(201)
                     .then(res => {
                         expect(JSON.parse(res.text)._id).toBe("PREVIEW");
@@ -42,13 +42,13 @@ describe("Image endpoint", function () {
                 await request(app)
                     .post("/image/")
                     .send({_id: "PREVIEW"})
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(201)
 
                 await request(app)
                     .post("/image/")
                     .send({_id: "PREVIEW"})
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(400);
             });
 
@@ -56,7 +56,7 @@ describe("Image endpoint", function () {
                 await request(app)
                     .post("/image/")
                     .send({_id: ""})
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(400);
             });
         });
@@ -66,12 +66,12 @@ describe("Image endpoint", function () {
                 await request(app)
                     .post("/image/")
                     .send({_id: "PREVIEW"})
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(201);
 
                 await request(app)
                     .delete("/image/PREVIEW/")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(200)
                     .then(result => {
                         expect(result.body._id).toBe("PREVIEW");
@@ -81,7 +81,7 @@ describe("Image endpoint", function () {
             test("Shouldn't delete nonexistent image" , async () => {
                 await request(app)
                     .delete("/image/WRONG/")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(404);
             });
         });

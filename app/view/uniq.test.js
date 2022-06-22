@@ -17,7 +17,7 @@ describe("Uniq endpoint", function () {
         test("Should get empty list", async () => {
             await request(app)
                 .get("/uniq/")
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(200)
                 .then(res => {
                     expect(res.body).toEqual([]);
@@ -30,7 +30,7 @@ describe("Uniq endpoint", function () {
             await request(app)
                 .post("/uniq/")
                 .send({_id: "ACTIVE"})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201)
                 .then(res => {
                     expect(res.body._id).toBe("ACTIVE");
@@ -41,7 +41,7 @@ describe("Uniq endpoint", function () {
             await request(app)
                 .post("/uniq/")
                 .send({some: "ACTIVE"})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(500);
         });
 
@@ -49,7 +49,7 @@ describe("Uniq endpoint", function () {
             await request(app)
                 .post("/uniq/")
                 .send({_id: ""})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(400);
         });
 
@@ -57,13 +57,13 @@ describe("Uniq endpoint", function () {
             await request(app)
                 .post("/uniq/")
                 .send({_id: "ACTIVE"})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201);
 
             await request(app)
                 .post("/uniq/")
                 .send({_id: "ACTIVE"})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(400);
         });
     });
@@ -73,12 +73,12 @@ describe("Uniq endpoint", function () {
             await request(app)
                 .post("/uniq/")
                 .send({_id: "EMAIL"})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201);
 
             await request(app)
                 .delete(`/uniq/EMAIL/`)
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(200)
                 .then(res => {
                     expect(res.body._id).toBe("EMAIL");
@@ -88,7 +88,7 @@ describe("Uniq endpoint", function () {
         test("Shouldn't delete with wrong id", async () => {
             await request(app)
                 .delete(`/uniq/PASSIVE/`)
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(404);
         });
     });

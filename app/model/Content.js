@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const Section = require("./Section");
-const Flag = require("./Flag");
 const Value = require("./Value");
 
 const ContentSchema = new mongoose.Schema({
@@ -11,6 +10,7 @@ const ContentSchema = new mongoose.Schema({
     },
     uniq: require("./schema/UniqSchema"),
     property: require("./schema/PropertySchema"),
+    flag: require("./schema/FlagSchema"),
     description: {
         type: Map,
         of: {
@@ -31,7 +31,6 @@ const ContentSchema = new mongoose.Schema({
             ref: Value,
         }
     },
-    flag: require("./schema/FlagSchema"),
     section: {
         type: [{
             type: String,

@@ -17,7 +17,7 @@ describe("Value endpoint", function () {
         test("Should get list", async () => {
             await request(app)
                 .get("/value/")
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(200);
         });
 
@@ -26,13 +26,13 @@ describe("Value endpoint", function () {
             //     await request(app)
             //         .post("/value/")
             //         .send({_id: "UNIQ"})
-            //         .set(...require("./mock/auth"))
+            //         .set(...require("../../test/createToken")())
             //         .expect(201);
             //
             //     await request(app)
             //         .post("/value/")
             //         .send({_id: "UNIQ"})
-            //         .set(...require("./mock/auth"))
+            //         .set(...require("../../test/createToken")())
             //         .expect(400);
             // });
 
@@ -40,13 +40,13 @@ describe("Value endpoint", function () {
                 await request(app)
                     .post("/directory/")
                     .send({_id: "COLOR"})
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(201);
 
                 await request(app)
                     .post("/value/")
                     .send({_id: "BLUE", directory: "COLOR"})
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(201)
                     .then(res => {
                         expect(res.body._id).toBe("BLUE");
@@ -59,18 +59,18 @@ describe("Value endpoint", function () {
                 await request(app)
                     .post("/directory/")
                     .send({_id: "COLOR"})
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(201);
 
                 await request(app)
                     .post("/value/")
                     .send({_id: "BLUE", directory: "COLOR"})
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(201);
 
                 await request(app)
                     .delete("/value/BLUE/")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(200)
                     .then(res => {
                         expect(res.body._id).toBe("BLUE");
@@ -80,7 +80,7 @@ describe("Value endpoint", function () {
             test("Shouldn't delete value with wrong id", async () => {
                 await request(app)
                     .delete("/value/WRONG/")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(404);
             });
         });
@@ -91,13 +91,13 @@ describe("Value endpoint", function () {
             await request(app)
                 .post("/directory/")
                 .send({_id: "COLOR"})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201);
 
             await request(app)
                 .post("/flag/")
                 .send({_id: "ACTIVE"})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201);
 
             await request(app)
@@ -107,7 +107,7 @@ describe("Value endpoint", function () {
                     directory: "COLOR",
                     flag: "ACTIVE",
                 })
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201)
                 .then(res => {
                     expect(res.body._id).toBe("RED");

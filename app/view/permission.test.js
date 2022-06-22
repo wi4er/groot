@@ -17,7 +17,7 @@ describe("Permission endpoint", function () {
         test("Should get list", async () => {
             await request(app)
                 .get("/permission/")
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(200)
                 .then(res => expect(res.body).toEqual([]));
         });
@@ -30,7 +30,7 @@ describe("Permission endpoint", function () {
                     entity: "CONTENT",
                     group: "1",
                 })
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201)
                 .then(res => {
                     expect(res.body.method).toBe("GET");
@@ -47,7 +47,7 @@ describe("Permission endpoint", function () {
                     entity: "CONTENT",
                     group: "1",
                 })
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(400);
         });
 
@@ -59,7 +59,7 @@ describe("Permission endpoint", function () {
                     entity: "WRONG",
                     group: "1",
                 })
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(400);
         });
 
@@ -70,7 +70,7 @@ describe("Permission endpoint", function () {
                     method: "GET",
                     entity: "CONTENT",
                 })
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(400);
         });
     });

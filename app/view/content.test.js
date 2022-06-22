@@ -18,7 +18,7 @@ describe("Content endpoint", () => {
         test("Should get list", async () => {
             await request(app)
                 .get("/content/")
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(200)
                 .then(res => {
                     expect(res.body).toEqual([]);
@@ -29,7 +29,7 @@ describe("Content endpoint", () => {
             await request(app)
                 .post("/content/")
                 .send({slug: "Some data"})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201)
                 .then(res => {
                     expect(res.body.timestamp).not.toBeUndefined();
@@ -40,12 +40,12 @@ describe("Content endpoint", () => {
         test("Should post and get list", async () => {
             await request(app)
                 .post("/content/")
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201);
 
             await request(app)
                 .get("/content/")
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(200)
                 .then(res => {
                     expect(res.body.length).toBe(1);
@@ -55,13 +55,13 @@ describe("Content endpoint", () => {
         test("Should post and get item", async () => {
             const id = await request(app)
                 .post("/content/")
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201)
                 .then(res => res.body._id);
 
             await request(app)
                 .get(`/content/${id}/`)
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(200)
                 .then(res => {
                     // expect(res.body.slug).toBe("SLUG");
@@ -74,7 +74,7 @@ describe("Content endpoint", () => {
             await request(app)
                 .post("/uniq/")
                 .send({_id: "EMAIL"})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201);
 
             await request(app)
@@ -85,7 +85,7 @@ describe("Content endpoint", () => {
                         value: "123"
                     }]
                 })
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201)
                 .then(res => {
                     expect(res.body.uniq[0].uniq).toEqual("EMAIL");
@@ -97,7 +97,7 @@ describe("Content endpoint", () => {
             await request(app)
                 .post("/uniq/")
                 .send({_id: "EMAIL"})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201);
 
             await request(app)
@@ -108,7 +108,7 @@ describe("Content endpoint", () => {
                         value: "123"
                     }]
                 })
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201);
 
             await request(app)
@@ -119,7 +119,7 @@ describe("Content endpoint", () => {
                         value: "123"
                     }]
                 })
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(400);
         });
     });
@@ -129,13 +129,13 @@ describe("Content endpoint", () => {
             await request(app)
                 .post("/flag/")
                 .send({_id: "ACTIVE"})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201);
 
             await request(app)
                 .post("/content/")
                 .send({flag: ["ACTIVE"]})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201)
                 .then(res => {
                     expect(res.body.flag).toEqual(["ACTIVE"]);
@@ -146,13 +146,13 @@ describe("Content endpoint", () => {
             await request(app)
                 .post("/flag/")
                 .send({_id: "ACTIVE"})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201);
 
             await request(app)
                 .post("/content/")
                 .send({flag: ["ACTIVE", "ACTIVE", "ACTIVE"]})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201)
                 .then(res => {
                     expect(res.body.flag).toEqual(["ACTIVE"]);
@@ -163,13 +163,13 @@ describe("Content endpoint", () => {
             await request(app)
                 .post("/flag/")
                 .send({_id: "ACTIVE"})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201)
 
             await request(app)
                 .post("/content/")
                 .send({flag: ["PASSIVE"]})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201)
                 .then(res => {
                     expect(res.body.flag).toBeUndefined();
@@ -182,7 +182,7 @@ describe("Content endpoint", () => {
             await request(app)
                 .post("/property/")
                 .send({_id: "NAME"})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201);
 
             await request(app)
@@ -192,7 +192,7 @@ describe("Content endpoint", () => {
                         "DEF": {"NAME": "VALUE"}
                     }
                 })
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201)
                 .then(result => {
                     expect(Object.keys(result.body.property)).toHaveLength(1);
@@ -204,13 +204,13 @@ describe("Content endpoint", () => {
             await request(app)
                 .post("/property/")
                 .send({_id: "NAME"})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201);
 
             await request(app)
                 .post("/lang/")
                 .send({_id: "EN"})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201);
 
             await request(app)
@@ -220,7 +220,7 @@ describe("Content endpoint", () => {
                         "EN": {"NAME": "VALUE"}
                     }
                 })
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201)
                 .then(result => {
                     expect(result.body.property["EN"]["NAME"]).toEqual("VALUE");
@@ -231,7 +231,7 @@ describe("Content endpoint", () => {
             await request(app)
                 .post("/property/")
                 .send({_id: "NAME"})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201);
 
             await request(app)
@@ -241,7 +241,7 @@ describe("Content endpoint", () => {
                         "DEF": {"ARTICLE": "VALUE"}
                     }
                 })
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201)
                 .then(res => {
                     expect(res.body.property).toBeUndefined();
@@ -254,7 +254,7 @@ describe("Content endpoint", () => {
             await request(app)
                 .post("/description/")
                 .send({_id: "SHORT"})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201)
 
             await request(app)
@@ -266,7 +266,7 @@ describe("Content endpoint", () => {
                         }
                     }
                 })
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201)
                 .then(res => {
                     expect(Object.keys(res.body.description)).toHaveLength(1);
@@ -278,7 +278,7 @@ describe("Content endpoint", () => {
             await request(app)
                 .post("/description/")
                 .send({_id: "NAME"})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201);
 
             await request(app)
@@ -290,7 +290,7 @@ describe("Content endpoint", () => {
                         }
                     }
                 })
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201)
                 .then(res => {
                     expect(res.body.description).toBeUndefined();
@@ -303,19 +303,19 @@ describe("Content endpoint", () => {
             await request(app)
                 .post("/directory/")
                 .send({_id: "COLOR"})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201);
 
             await request(app)
                 .post("/value/")
                 .send({_id: "RED", directory: "COLOR"})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201);
 
             await request(app)
                 .post("/content/")
                 .send({directory: {"COLOR": "RED"}})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201)
                 .then(res => {
                     expect(Object.keys(res.body.directory)).toHaveLength(1);
@@ -327,19 +327,19 @@ describe("Content endpoint", () => {
             await request(app)
                 .post("/directory/")
                 .send({_id: "COLOR"})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201);
 
             await request(app)
                 .post("/value/")
                 .send({_id: "RED", directory: "COLOR"})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201);
 
             await request(app)
                 .post("/content/")
                 .send({directory: {"WRONG": "RED"}})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201)
                 .then(res => {
                     expect(res.body.directory).toBeUndefined();
@@ -350,19 +350,19 @@ describe("Content endpoint", () => {
             await request(app)
                 .post("/directory/")
                 .send({_id: "COLOR"})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201);
 
             await request(app)
                 .post("/value/")
                 .send({_id: "RED", directory: "COLOR"})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201);
 
             await request(app)
                 .post("/content/")
                 .send({directory: {"COLOR": "WRONG"}})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201)
                 .then(res => {
                     expect(res.body.directory).toBeUndefined();
@@ -375,13 +375,13 @@ describe("Content endpoint", () => {
             await request(app)
                 .post("/event/")
                 .send({_id: "CREATE"})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201);
 
             await request(app)
                 .post("/content/")
                 .send({event: {"CREATE": "2000-01-01T12:00:00.000Z"}})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201)
                 .then(res => {
                     expect(Object.keys(res.body.event)).toHaveLength(1);
@@ -393,7 +393,7 @@ describe("Content endpoint", () => {
             await request(app)
                 .post("/content/")
                 .send({event: {"CREATE": "2000-01-01T12:00:00.000Z"}})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201)
                 .then(res => {
                     expect(Object.keys(res.body.event)).toHaveLength(0);
@@ -407,7 +407,7 @@ describe("Content endpoint", () => {
                 await request(app)
                     .post("/property/")
                     .send({_id: "VALUE"})
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(201);
 
                 for (let i = 0; i < 10; i++) {
@@ -420,13 +420,13 @@ describe("Content endpoint", () => {
                                 }
                             }
                         })
-                        .set(...require("./mock/auth"))
+                        .set(...require("../../test/createToken")())
                         .expect(201);
                 }
 
                 await request(app)
                     .get("/content/?filter[property][VALUE][in]=NUM_1")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(200)
                     .then(res => {
                         expect(res.body).toHaveLength(5);
@@ -439,7 +439,7 @@ describe("Content endpoint", () => {
                 await request(app)
                     .post("/flag/")
                     .send({_id: "NEW"})
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(201);
 
                 for (let i = 0; i < 5; i++) {
@@ -448,14 +448,14 @@ describe("Content endpoint", () => {
                         .send({
                             flag: i % 2 === 1 ? ["NEW"] : undefined
                         })
-                        .set(...require("./mock/auth"))
+                        .set(...require("../../test/createToken")())
                         .expect(201);
                 }
 
                 await request(app)
                     .get("/content/?filter[flag][in]=NEW")
                     .expect(200)
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .then(res => {
                         expect(res.body).toHaveLength(2);
                     });
@@ -467,7 +467,7 @@ describe("Content endpoint", () => {
                 await request(app)
                     .post("/event/")
                     .send({_id: "UPDATE"})
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(201);
 
                 for (let i = 1; i <= 5; i++) {
@@ -476,13 +476,13 @@ describe("Content endpoint", () => {
                         .send({
                             event: {"UPDATE": `2000-0${i}-01T12:00:00.000Z`}
                         })
-                        .set(...require("./mock/auth"))
+                        .set(...require("../../test/createToken")())
                         .expect(201);
                 }
 
                 await request(app)
                     .get("/content/?filter[event][UPDATE][gt]=2000-02-01T12:00:00.000Z")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(200)
                     .then(res => {
                         expect(res.body).toHaveLength(4);
@@ -493,7 +493,7 @@ describe("Content endpoint", () => {
                 await request(app)
                     .post("/event/")
                     .send({_id: "UPDATE"})
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(201);
 
                 for (let i = 1; i <= 5; i++) {
@@ -502,13 +502,13 @@ describe("Content endpoint", () => {
                         .send({
                             event: {"UPDATE": `2000-0${i}-01T12:00:00.000Z`}
                         })
-                        .set(...require("./mock/auth"))
+                        .set(...require("../../test/createToken")())
                         .expect(201);
                 }
 
                 await request(app)
                     .get("/content/?filter[event][UPDATE][lt]=2000-03-01T12:00:00.000Z")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(200)
                     .then(res => {
                         expect(res.body).toHaveLength(3);
@@ -519,7 +519,7 @@ describe("Content endpoint", () => {
                 await request(app)
                     .post("/event/")
                     .send({_id: "UPDATE"})
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(201);
 
                 for (let i = 1; i <= 5; i++) {
@@ -528,13 +528,13 @@ describe("Content endpoint", () => {
                         .send({
                             event: {"UPDATE": `2000-0${i}-01T12:00:00.000Z`}
                         })
-                        .set(...require("./mock/auth"))
+                        .set(...require("../../test/createToken")())
                         .expect(201);
                 }
 
                 await request(app)
                     .get("/content/?filter[event][UPDATE][gt]=2000-02-01T12:00:00.000Z&filter[event][UPDATE][lt]=2000-04-01T12:00:00.000Z")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(200)
                     .then(res => {
                         expect(res.body).toHaveLength(3);
@@ -547,7 +547,7 @@ describe("Content endpoint", () => {
                 await request(app)
                     .post("/uniq/")
                     .send({_id: "EMAIL"})
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(201);
 
                 for (let i = 1; i <= 5; i++) {
@@ -559,13 +559,13 @@ describe("Content endpoint", () => {
                                 value: `VALUE_${i}`
                             }
                         })
-                        .set(...require("./mock/auth"))
+                        .set(...require("../../test/createToken")())
                         .expect(201);
                 }
 
                 await request(app)
                     .get("/content/?filter[uniq][EMAIL][in]=VALUE_3")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(200)
                     .then(res => {
                         expect(res.body).toHaveLength(1);
@@ -577,7 +577,7 @@ describe("Content endpoint", () => {
                 // await request(app)
                 //     .post("/uniq/")
                 //     .send({_id: "EMAIL"})
-                //     .set(...require("./mock/auth"))
+                //     .set(...require("../../test/createToken")())
                 //     .expect(201);
                 //
                 // for (let i = 1; i <= 5; i++) {
@@ -589,13 +589,13 @@ describe("Content endpoint", () => {
                 //                 value: `VALUE_${i}`
                 //             }
                 //         })
-                //         .set(...require("./mock/auth"))
+                //         .set(...require("../../test/createToken")())
                 //         .expect(201);
                 // }
                 //
                 // await request(app)
                 //     .get("/content/?filter[uniq][in]=VALUE_5")
-                //     .set(...require("./mock/auth"))
+                //     .set(...require("../../test/createToken")())
                 //     .expect(200)
                 //     .then(res => {
                 //         expect(res.body).toHaveLength(1);
@@ -610,7 +610,7 @@ describe("Content endpoint", () => {
             await request(app)
                 .post("/flag/")
                 .send({_id: "STATUS"})
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(201);
 
             for (let i = 0; i < 6; i++) {
@@ -619,13 +619,13 @@ describe("Content endpoint", () => {
                     .send({
                         flag: [i % 2 === 0 ? "STATUS" : undefined],
                     })
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(201);
             }
 
             await request(app)
                 .get("/content/?sort[flag][STATUS]=asc")
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(200)
                 .then(res => {
 
@@ -641,13 +641,13 @@ describe("Content endpoint", () => {
             for (let i = 0; i < 10; i++) {
                 await request(app)
                     .post("/content/")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(201);
             }
 
             await request(app)
                 .get("/content/?limit=5")
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(200)
                 .then(res => {
                     expect(res.headers["total-row-count"]).toBe("10");
@@ -659,13 +659,13 @@ describe("Content endpoint", () => {
             for (let i = 0; i < 10; i++) {
                 await request(app)
                     .post("/content/")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(201);
             }
 
             await request(app)
                 .head("/content/?limit=5")
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(200)
                 .then(res => {
                     expect(res.headers["total-row-count"]).toBe("10");
@@ -676,13 +676,13 @@ describe("Content endpoint", () => {
             for (let i = 0; i < 10; i++) {
                 await request(app)
                     .post("/content/")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(201);
             }
 
             await request(app)
                 .get("/content/?offset=4")
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(200)
                 .then(res => {
                     expect(res.headers["total-row-count"]).toBe("10");
@@ -694,13 +694,13 @@ describe("Content endpoint", () => {
             for (let i = 0; i < 10; i++) {
                 await request(app)
                     .post("/content/")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(201);
             }
 
             await request(app)
                 .get("/content/?limit=3&offset=3")
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(200)
                 .then(res => {
                     expect(res.headers["total-row-count"]).toBe("10");
@@ -713,7 +713,7 @@ describe("Content endpoint", () => {
         test("Should get list with permission", async () => {
             await request(app)
                 .post("/permission/")
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .send({
                     method: "GET",
                     entity: "CONTENT",
@@ -737,7 +737,7 @@ describe("Content endpoint", () => {
         test("Shouldn't get list without permission", async () => {
             await request(app)
                 .post("/permission/")
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .send({
                     method: "GET",
                     entity: "CONTENT",

@@ -18,7 +18,7 @@ describe("Section endpoint", function () {
             test("Should get list without fields", async () => {
                 await request(app)
                     .get("/section/")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(200);
             });
         });
@@ -27,7 +27,7 @@ describe("Section endpoint", function () {
             test("Should and item", async () => {
                 await request(app)
                     .post("/section/")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(201)
                     .then(res => {
                         expect(res.body._id.length).toBe(24);
@@ -37,12 +37,12 @@ describe("Section endpoint", function () {
             test("Should and item and get list", async () => {
                 await request(app)
                     .post("/section/")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(201);
 
                 await request(app)
                     .get("/section/")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(200)
                     .then(res => {
                         expect(res.body.length).toBe(1);
@@ -54,14 +54,14 @@ describe("Section endpoint", function () {
             test("Should and item and update", async () => {
                 const id = await request(app)
                     .post("/section/")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(201)
                     .then(res => res.body._id);
 
                 
                 await request(app)
                     .put(`/section/${id}/`)
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .send({_id: id})
                     .expect(200)
                     .then(res => {
@@ -74,14 +74,14 @@ describe("Section endpoint", function () {
             test("Should and item and update", async () => {
                 const id = await request(app)
                     .post("/section/")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(201)
                     .then(res => res.body._id);
 
 
                 await request(app)
                     .delete(`/section/${id}/`)
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(200)
                     .then(res => {
                         expect(res.body._id).toBe(id);
@@ -98,7 +98,7 @@ describe("Section endpoint", function () {
                 for (let i = 0; i < 10; i++) {
                     await request(app)
                         .post("/section/")
-                        .set(...require("./mock/auth"))
+                        .set(...require("../../test/createToken")())
                         .expect(201)
                         .then(res => {
                             list.push(res.body._id);
@@ -107,7 +107,7 @@ describe("Section endpoint", function () {
                 
                 await request(app)
                     .get(`/section/?filter[field][id][in]=${list[0]};${list[1]}`)
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(200)
                     .then(res => {
                         expect(res.body).toHaveLength(2);
@@ -122,7 +122,7 @@ describe("Section endpoint", function () {
                 for (let i = 0; i < 10; i++) {
                     await request(app)
                         .post("/section/")
-                        .set(...require("./mock/auth"))
+                        .set(...require("../../test/createToken")())
                         .expect(201)
                         .then(res => {
                             list.push(res.body.created);
@@ -131,7 +131,7 @@ describe("Section endpoint", function () {
 
                 await request(app)
                     .get(`/section/?filter[field][created][gt]=${list[2]}&filter[field][created][lt]=${list[5]}`)
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(200)
                     .then(res => {
                         expect(res.body).toHaveLength(4);
@@ -148,7 +148,7 @@ describe("Section endpoint", function () {
                 for (let i = 0; i < 10; i++) {
                     await request(app)
                         .post("/section/")
-                        .set(...require("./mock/auth"))
+                        .set(...require("../../test/createToken")())
                         .expect(201)
                         .then(res => {
                             list.push(res.body.timestamp);
@@ -157,7 +157,7 @@ describe("Section endpoint", function () {
 
                 await request(app)
                     .get(`/section/?filter[field][timestamp][gt]=${list[3]}&filter[field][timestamp][lt]=${list[5]}`)
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(200)
                     .then(res => {
                         expect(res.body).toHaveLength(3);
@@ -170,28 +170,28 @@ describe("Section endpoint", function () {
             test("Shouldn't filter by wrong field", async () => {
                 await request(app)
                     .get(`/section/?filter[field][wrong][in]=WRONG`)
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(400);
             });
 
             test("Shouldn't filter by wrong operation", async () => {
                 await request(app)
                     .get(`/section/?filter[field][id][wrong]=WRONG`)
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(400);
             });
 
             test("Shouldn't filter without operation", async () => {
                 await request(app)
                     .get(`/section/?filter[field][id]=WRONG`)
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(400);
             });
 
             test("Shouldn't filter without field name", async () => {
                 await request(app)
                     .get(`/section/?filter[field]=WRONG`)
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(400);
             });
         });
@@ -200,14 +200,14 @@ describe("Section endpoint", function () {
             test("Should filter by property id", async () => {
                 await request(app)
                     .post("/property/")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .send({_id: "PROP"})
                     .expect(201);
 
                 for (let i = 0; i < 10; i++) {
                     await request(app)
                         .post("/section/")
-                        .set(...require("./mock/auth"))
+                        .set(...require("../../test/createToken")())
                         .send({
                             property: {
                                 DEF: {PROP: `VALUE_${i}`}
@@ -218,7 +218,7 @@ describe("Section endpoint", function () {
 
                 await request(app)
                     .get(`/section/?filter[property][PROP][in]=VALUE_3`)
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(200)
                     .then(res => {
                         expect(res.body).toHaveLength(1);
@@ -229,14 +229,14 @@ describe("Section endpoint", function () {
             test("Should filter by wrong property", async () => {
                 await request(app)
                     .post("/property/")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .send({_id: "PROP"})
                     .expect(201);
 
                 for (let i = 0; i < 10; i++) {
                     await request(app)
                         .post("/section/")
-                        .set(...require("./mock/auth"))
+                        .set(...require("../../test/createToken")())
                         .send({
                             property: {
                                 DEF: {PROP: `VALUE_${i}`}
@@ -247,7 +247,7 @@ describe("Section endpoint", function () {
 
                 await request(app)
                     .get(`/section/?filter[property][WRONG][in]=WRONG`)
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(200)
                     .then(res => {
                         expect(res.body).toHaveLength(0);
@@ -257,21 +257,21 @@ describe("Section endpoint", function () {
             test("Shouldn't filter with wrong operation", async () => {
                 await request(app)
                     .get(`/section/?filter[property][PROP][WRONG]=WRONG`)
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(400);
             });
 
             test("Shouldn't filter without operation", async () => {
                 await request(app)
                     .get(`/section/?filter[property][WRONG]=WRONG`)
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(400);
             });
 
             test("Shouldn't filter without property name", async () => {
                 await request(app)
                     .get(`/section/?filter[property]=WRONG`)
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(400);
             });
         });
@@ -280,14 +280,14 @@ describe("Section endpoint", function () {
             test("Should filter by flag id", async () => {
                 await request(app)
                     .post("/flag/")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .send({_id: "ACTIVE"})
                     .expect(201);
 
                 for (let i = 0; i < 10; i++) {
                     await request(app)
                         .post("/section/")
-                        .set(...require("./mock/auth"))
+                        .set(...require("../../test/createToken")())
                         .send({
                             flag: i % 2 ? "ACTIVE" : undefined
                         })
@@ -296,7 +296,7 @@ describe("Section endpoint", function () {
 
                 await request(app)
                     .get(`/section/?filter[flag][in]=ACTIVE`)
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(200)
                     .then(res => {
                         expect(res.body).toHaveLength(5);
@@ -306,20 +306,20 @@ describe("Section endpoint", function () {
             test("Should filter by two flag", async () => {
                 await request(app)
                     .post("/flag/")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .send({_id: "ACTIVE"})
                     .expect(201);
 
                 await request(app)
                     .post("/flag/")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .send({_id: "ENABLE"})
                     .expect(201);
 
                 for (let i = 0; i < 10; i++) {
                     await request(app)
                         .post("/section/")
-                        .set(...require("./mock/auth"))
+                        .set(...require("../../test/createToken")())
                         .send({
                             flag: [
                                 i % 2 ? "ACTIVE" : undefined,
@@ -331,7 +331,7 @@ describe("Section endpoint", function () {
 
                 await request(app)
                     .get(`/section/?filter[flag][in]=ENABLE;ACTIVE`)
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(200)
                     .then(res => {
                         expect(res.body).toHaveLength(8);
@@ -341,20 +341,20 @@ describe("Section endpoint", function () {
             test("Should filter by two flag items", async () => {
                 await request(app)
                     .post("/flag/")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .send({_id: "ACTIVE"})
                     .expect(201);
 
                 await request(app)
                     .post("/flag/")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .send({_id: "ENABLE"})
                     .expect(201);
 
                 for (let i = 0; i < 10; i++) {
                     await request(app)
                         .post("/section/")
-                        .set(...require("./mock/auth"))
+                        .set(...require("../../test/createToken")())
                         .send({
                             flag: [
                                 i % 2 ? "ACTIVE" : undefined,
@@ -366,7 +366,7 @@ describe("Section endpoint", function () {
 
                 await request(app)
                     .get(`/section/?filter[flag][in]=ENABLE&filter[flag][in]=ACTIVE`)
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(200)
                     .then(res => {
                         expect(res.body).toHaveLength(8);
@@ -376,20 +376,20 @@ describe("Section endpoint", function () {
             test("Should filter by multi flag", async () => {
                 await request(app)
                     .post("/flag/")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .send({_id: "ACTIVE"})
                     .expect(201);
 
                 await request(app)
                     .post("/flag/")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .send({_id: "ENABLE"})
                     .expect(201);
 
                 for (let i = 0; i < 10; i++) {
                     await request(app)
                         .post("/section/")
-                        .set(...require("./mock/auth"))
+                        .set(...require("../../test/createToken")())
                         .send({
                             flag: [
                                 i % 2 ? "ACTIVE" : undefined,
@@ -401,7 +401,7 @@ describe("Section endpoint", function () {
 
                 await request(app)
                     .get(`/section/?filter[flag][and]=ENABLE;ACTIVE`)
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(200)
                     .then(res => {
                         expect(res.body).toHaveLength(3);
@@ -416,13 +416,13 @@ describe("Section endpoint", function () {
             test("Should filter by value", async () => {
                 await request(app)
                     .post("/directory/")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .send({_id: "COLOR"})
                     .expect(201);
 
                 await request(app)
                     .post("/value/")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .send({
                         _id: "BLUE",
                         directory: "COLOR"
@@ -432,7 +432,7 @@ describe("Section endpoint", function () {
                 for (let i = 0; i < 10; i++) {
                     await request(app)
                         .post("/section/")
-                        .set(...require("./mock/auth"))
+                        .set(...require("../../test/createToken")())
                         .send({
                             directory: {
                                 COLOR: i % 2 ? "BLUE" : undefined,
@@ -443,7 +443,7 @@ describe("Section endpoint", function () {
 
                 await request(app)
                     .get(`/section/`)
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(200)
                     .then(res => {
 
@@ -455,20 +455,20 @@ describe("Section endpoint", function () {
             test("Should filer by flag and property", async () => {
                 await request(app)
                     .post("/flag/")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .send({_id: "ACTIVE"})
                     .expect(201);
 
                 await request(app)
                     .post("/property/")
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .send({_id: "ARTICLE"})
                     .expect(201);
 
                 for (let i = 0; i < 10; i++) {
                     await request(app)
                         .post("/section/")
-                        .set(...require("./mock/auth"))
+                        .set(...require("../../test/createToken")())
                         .send({
                             flag: i % 2 ? "ACTIVE" : undefined,
                             property: {DEF: {ARTICLE:  i < 5 ? "VALUE" : undefined,}}
@@ -478,7 +478,7 @@ describe("Section endpoint", function () {
 
                 await request(app)
                     .get(`/section/?filter[property][ARTICLE][in]=VALUE&filter[flag][in]=ACTIVE`)
-                    .set(...require("./mock/auth"))
+                    .set(...require("../../test/createToken")())
                     .expect(200)
                     .then(res => {
                         expect(res.body).toHaveLength(2);

@@ -17,7 +17,7 @@ describe("Event endpoint", () => {
         test("Should get event list", async () => {
             await request(app)
                 .get("/event/")
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(200)
                 .then(response => {
                     expect(response.body.length).toBe(0);
@@ -27,7 +27,7 @@ describe("Event endpoint", () => {
         test("Should add event", async () => {
             await request(app)
                 .post("/event/")
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .send({_id: "MODIFY"})
                 .expect(201)
                 .then(response => {
@@ -38,13 +38,13 @@ describe("Event endpoint", () => {
         test("Should update event", async () => {
             await request(app)
                 .post("/event/")
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .send({_id: "MODIFY"})
                 .expect(201);
 
             await request(app)
                 .put(`/event/MODIFY/`)
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .send({_id: "MODIFY"})
                 .expect(200)
                 .then(response => {
@@ -55,13 +55,13 @@ describe("Event endpoint", () => {
         test("Should delete event", async () => {
             await request(app)
                 .post("/event/")
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .send({_id: "MODIFY"})
                 .expect(201);
 
             await request(app)
                 .delete(`/event/MODIFY/`)
-                .set(...require("./mock/auth"))
+                .set(...require("../../test/createToken")())
                 .expect(200)
                 .then(res => {
                     expect(res.body._id).toBe("MODIFY");
