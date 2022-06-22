@@ -20,6 +20,9 @@ const sectionQuery = {
         "value": {
             ...require("./filter/valueFilter"),
         },
+        "uniq": {
+            ...require("./filter/uniqFilter"),
+        }
     }),
     parseSort: require("./sort")({
 

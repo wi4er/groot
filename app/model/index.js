@@ -68,9 +68,10 @@ class Model {
 
     createConnection(req, res, next) {
         this.connect()
-            .then(() => {
-                return require("./Content").ensureIndexes()
-            })
+            .then(() => Promise.all([
+                require("./Content").ensureIndexes(),
+                require("./Section").ensureIndexes(),
+            ]))
             .then(() => next())
             .catch(err => next(err));
     }

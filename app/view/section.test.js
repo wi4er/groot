@@ -1,5 +1,7 @@
 const request = require("supertest");
 const app = require("..");
+const env = require("../../environment");
+const jwt = require("jsonwebtoken");
 
 afterEach(() => require("../model").clearDatabase());
 afterAll(() => require("../model").disconnect());
@@ -193,6 +195,68 @@ describe("Section endpoint", function () {
                     .get(`/section/?filter[field]=WRONG`)
                     .set(...require("../../test/createToken")())
                     .expect(400);
+            });
+        });
+
+        describe("Section uniq filter", () => {
+            test("Should filter by uniq and value", async () => {
+                await request(app)
+                    .post("/uniq/")
+                    .set(...require("../../test/createToken")())
+                    .send({_id: "SLUG"})
+                    .expect(201);
+
+                for (let i = 0; i < 10; i++) {
+                    await request(app)
+                        .post("/section/")
+                        .set(...require("../../test/createToken")())
+                        .send({
+                            uniq: {
+                                uniq: "SLUG",
+                                value: `VALUE_${i}`
+                            }
+                        })
+                        .expect(201);
+                }
+
+                await request(app)
+                    .get(`/section/?filter[uniq][in]=VALUE_2;VALUE_4`)
+                    .set(...require("../../test/createToken")())
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body).toHaveLength(2);
+                        expect(res.body[0].uniq[0].value).toBe("VALUE_2");
+                        expect(res.body[1].uniq[0].value).toBe("VALUE_4");
+                    });
+            });
+
+            test("Should filter by uniq and value", async () => {
+                await request(app)
+                    .post("/uniq/")
+                    .set(...require("../../test/createToken")())
+                    .send({_id: "SLUG"})
+                    .expect(201);
+
+                for (let i = 0; i < 10; i++) {
+                    await request(app)
+                        .post("/section/")
+                        .set(...require("../../test/createToken")())
+                        .send({
+                            uniq: {
+                                uniq: "SLUG",
+                                value: `VALUE_${i}`
+                            }
+                        })
+                        .expect(201);
+                }
+
+                await request(app)
+                    .get(`/section/?filter[uniq][SLUG][in]=VALUE_2;VALUE_4`)
+                    .set(...require("../../test/createToken")())
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body).toHaveLength(2);
+                    });
             });
         });
 
@@ -485,5 +549,51 @@ describe("Section endpoint", function () {
                     });
             });
         })
+    });
+
+    describe("Section permission", () => {
+        test("Shouldn't get without authorization", async () => {
+            await request(app)
+                .get("/section/")
+                .expect(403);
+        });
+
+        test("Shouldn't get without group permission", async () => {
+            await request(app)
+                .get("/section/")
+                .set(
+                    "authorization",
+                    `Bearer ${jwt.sign(
+                        {id: 1, group: [222]},
+                        env.SECRET,
+                        { algorithm: 'HS256'}
+                    )}`
+                )
+                .expect(403);
+        });
+
+        test("Should get with group permission", async () => {
+            await request(app)
+                .post("/permission/")
+                .set(...require("../../test/createToken")())
+                .send({
+                    entity: "SECTION",
+                    method: "GET",
+                    group: 222,
+                })
+                .expect(201);
+
+            await request(app)
+                .get("/section/")
+                .set(
+                    "authorization",
+                    `Bearer ${jwt.sign(
+                        {id: 1, group: [222]},
+                        env.SECRET,
+                        { algorithm: 'HS256'}
+                    )}`
+                )
+                .expect(200);
+        });
     });
 });

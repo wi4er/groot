@@ -21,9 +21,7 @@ module.exports = (entity, method) => (req, res, next) => {
         group: {$in: req.user?.group},
     })
         .then(row => {
-            if (!row) {
-                next(new PermissionError("Permission denied!"));
-            }
+            PermissionError.assert(row, "Permission denied!");
 
             next();
         })

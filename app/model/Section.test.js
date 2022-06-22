@@ -3,6 +3,7 @@ const Property = require("./Property");
 const Image = require("./Image");
 const Description = require("./Description");
 const Flag = require("./Flag");
+const Uniq = require("./Uniq");
 
 afterEach(() => require(".").clearDatabase());
 beforeAll(() => require(".").connect());
@@ -23,6 +24,40 @@ describe("Section", () => {
             expect(inst._id.toString().length).toBe(24);
             expect(inst.timestamp).not.toBeUndefined();
             expect(inst.created).not.toBeUndefined();
+        });
+    });
+
+    describe("Section with uniq", () => {
+        test("Should create with uniq", async () => {
+            await new Uniq({_id: "SLUG"}).save();
+
+            const inst = await new Section({
+                uniq: {
+                    uniq: "SLUG",
+                    value: "VALUE",
+                }
+            }).save();
+
+            expect(inst.uniq[0].uniq).toBe("SLUG");
+            expect(inst.uniq[0].value).toBe("VALUE");
+        });
+
+        test("Shouldn't create with non uniq", async () => {
+            await new Uniq({_id: "SLUG"}).save();
+
+            await new Section({
+                uniq: {
+                    uniq: "SLUG",
+                    value: "VALUE",
+                }
+            }).save();
+
+            await expect(new Section({
+                uniq: {
+                    uniq: "SLUG",
+                    value: "VALUE",
+                }
+            }).save()).rejects.toThrow();
         });
     });
 

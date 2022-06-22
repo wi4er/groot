@@ -47,4 +47,12 @@ SectionSchema.pre("save", function (next) {
     next();
 });
 
+SectionSchema.index(
+    {"uniq.value": 1},
+    {
+        unique: true,
+        partialFilterExpression: {"uniq.value": {$exists: true}},
+    }
+);
+
 module.exports = mongoose.model('section', SectionSchema);
