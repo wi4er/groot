@@ -1,4 +1,4 @@
-const Permission = require("../model/Permission");
+const Permission = require("../model/MethofPermission");
 const PermissionError = require("../exception/PermissionError");
 const {PUBLIC} = require("./entity");
 const environment = require("../../environment");

@@ -25,12 +25,21 @@ describe("Section", () => {
             expect(inst.timestamp).not.toBeUndefined();
             expect(inst.created).not.toBeUndefined();
         });
+
+        test("Shouldn't edit created", async () => {
+            const inst = await new Section({}).save();
+            const oldDate = inst.created;
+
+            inst.created = new Date();
+            await inst.save();
+
+            expect(oldDate).toBe(inst.created);
+        });
     });
 
     describe("Section with uniq", () => {
         test("Should create with uniq", async () => {
             await new Uniq({_id: "SLUG"}).save();
-
             const inst = await new Section({
                 uniq: {
                     uniq: "SLUG",

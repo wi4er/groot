@@ -1,4 +1,4 @@
-const Permission = require("./Permission");
+const Permission = require("./MethofPermission");
 
 afterEach(() => require(".").clearDatabase());
 beforeAll(() => require(".").connect());

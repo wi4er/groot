@@ -45,9 +45,8 @@ describe("Content entity", () => {
 
             inst.created = new Date();
             await inst.save();
-            const newDate = inst.created;
 
-            expect(oldDate).toBe(newDate);
+            expect(oldDate).toBe(inst.created);
         });
     });
 
@@ -57,7 +56,7 @@ describe("Content entity", () => {
 
             const inst = await new Content({
                 uniq: {
-                    uniq: "DATA_1",
+                    uniq: "DATA",
                     value: "VALUE",
                 }
             }).save();
@@ -65,19 +64,49 @@ describe("Content entity", () => {
             expect(inst.uniq[0].value).toBe("VALUE");
         });
 
-        test("Should create many with uniq", async () => {
+        test("Should create with duplicate uniq", async () => {
+            // await new Uniq({_id: "DATA"}).save();
+            //
+            // const inst = await new Content({
+            //     uniq: [{
+            //         uniq: "DATA",
+            //         value: "VALUE",
+            //     }, {
+            //         uniq: "DATA",
+            //         value: "VALUE",
+            //     }]
+            // }).save();
+            //
+            // expect(inst.uniq.length).toBe(1);
+            // expect(inst.uniq[0].value).toBe("VALUE");
+        });
+
+        test("Should create with wrong uniq", async () => {
+            const inst = await new Content({
+                uniq: {
+                    uniq: "DATA",
+                    value: "VALUE",
+                }
+            }).save();
+
+            expect(inst.uniq).toEqual([]);
+        });
+
+        test("Should create with wrong and correct uniq", async () => {
             await new Uniq({_id: "DATA"}).save();
 
             const inst = await new Content({
                 uniq: [{
-                    uniq: "DATA_1",
+                    uniq: "DATA",
                     value: "VALUE",
                 }, {
-                    uniq: "DATA_1",
+                    uniq: "WRONG",
                     value: "VALUE",
                 }]
             }).save();
 
+            expect(inst.uniq.length).toBe(1);
+            expect(inst.uniq[0].uniq).toBe("DATA");
             expect(inst.uniq[0].value).toBe("VALUE");
         });
 

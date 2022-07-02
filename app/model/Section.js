@@ -30,6 +30,10 @@ const SectionSchema = new mongoose.Schema({
             ref: Value,
         },
     },
+    event: {
+        type: Map,
+        of: Date,
+    },
 });
 
 SectionSchema.pre("save", require("./cleaner/propertyCleaner"));
@@ -37,6 +41,8 @@ SectionSchema.pre("save", require("./cleaner/descriptionCleaner"));
 SectionSchema.pre("save", require("./cleaner/flagCleaner"));
 SectionSchema.pre("save", require("./cleaner/imageCleaner"));
 SectionSchema.pre("save", require("./cleaner/directoryCleaner"));
+SectionSchema.pre("save", require("./cleaner/eventCleaner"));
+SectionSchema.pre("save", require("./cleaner/uniqCleaner"));
 SectionSchema.pre("save", function (next) {
     this.timestamp = new Date();
 

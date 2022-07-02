@@ -1,6 +1,6 @@
 const {Router} = require("express");
 const router = Router();
-const Permission = require("../model/Permission");
+const Permission = require("../model/MethofPermission");
 const {PERMISSION} = require("../permission/entity");
 const {GET, POST, PUT, DELETE} = require("../permission/method");
 const permissionCheck = require("../permission/check");

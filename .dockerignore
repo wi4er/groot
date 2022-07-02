@@ -2,7 +2,7 @@
 /coverage
 /.idea
 /init
-/tests
+/test
 /docker-compose.yml
 /build.sh
 /.git
