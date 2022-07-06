@@ -402,6 +402,34 @@ describe("Content endpoint", () => {
     });
 
     describe("Content filter", () => {
+        describe("Content section filter", () => {
+            test("Should fetch with property filter", async () => {
+                const id = await request(app)
+                    .post("/section/")
+                    .send({})
+                    .set(...require("../../test/createToken")())
+                    .expect(201)
+                    .then(res => res.body._id);
+
+                for (let i = 0; i < 10; i++) {
+                    await request(app)
+                        .post("/content/")
+                        .send({section: [i % 2 ? id : undefined]})
+                        .set(...require("../../test/createToken")())
+                        .expect(201);
+                }
+
+                await request(app)
+                    .get(`/content/?filter[section][in]=${id}`)
+                    .set(...require("../../test/createToken")())
+                    .expect(200)
+                    .then(res => {
+                        expect(res.body.length).toBe(5);
+                        expect(res.body[0].section).toEqual([id]);
+                    });
+            });
+        });
+
         describe("Content property filter", () => {
             test("Should fetch with property filter", async () => {
                 await request(app)

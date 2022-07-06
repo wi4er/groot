@@ -7,6 +7,9 @@ const SectionSchema = new mongoose.Schema({
         type: Date,
         immutable: true,
     },
+    section: {
+        type: mongoose.Types.ObjectId,
+    },
     uniq: require("./schema/UniqSchema"),
     flag: require("./schema/FlagSchema"),
     property: require("./schema/PropertySchema"),

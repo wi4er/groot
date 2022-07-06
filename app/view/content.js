@@ -11,6 +11,9 @@ const contentQuery =  {
         "field": {
             ...require("./filter/fieldFilter"),
         },
+        "section": {
+            ...require("./filter/sectionFilter"),
+        },
         "property": {
             ...require("./filter/propertyFilter"),
         },

@@ -33,7 +33,7 @@ const ContentSchema = new mongoose.Schema({
     },
     section: {
         type: [{
-            type: String,
+            type: mongoose.Types.ObjectId,
             ref: Section,
         }],
         default: undefined,
